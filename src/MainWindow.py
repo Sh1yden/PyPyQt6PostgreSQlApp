@@ -1,18 +1,20 @@
 from PyQt6.QtWidgets import QMainWindow, QMessageBox
 from PyQt6.QtCore import pyqtSlot  # Slot функция реагирует на действие в программе
-
 from MainMenu import MainMenu
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
+        # Настройка главного окна
         super().__init__(parent)
+        self.setWindowTitle("Managing student assignments")
 
+        # Настройка главного меню
         # parent=self установка родительского окна для главного меню
         main_menu = MainMenu(parent=self)
         self.setMenuBar(main_menu)  # установка главного меню для окна
-
+        # Настройка кнопок
         main_menu.about.triggered.connect(self.about)
         main_menu.about_qt.triggered.connect(self.about_qt)
 
