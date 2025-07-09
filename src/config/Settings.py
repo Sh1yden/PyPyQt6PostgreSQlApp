@@ -5,8 +5,8 @@ import os
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(os.path.dirname(CURRENT_DIR))
-SAVE_DIR = os.path.join(PROJECT_DIR, "media")
-SAVE_FILE = f"{SAVE_DIR}/db_settings.json"
+SAVE_DIR = Path(os.path.join(PROJECT_DIR, "media"))
+SAVE_FILE = Path(f"{SAVE_DIR}/db_settings.json")
 
 
 class Settings:
