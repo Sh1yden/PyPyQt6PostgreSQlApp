@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow, QMessageBox
 from PyQt6.QtCore import pyqtSlot  # Slot функция реагирует на действие в программе
-from MainMenu import MainMenu
+from src.ui.MainMenu import MainMenu
 
 
 class MainWindow(QMainWindow):

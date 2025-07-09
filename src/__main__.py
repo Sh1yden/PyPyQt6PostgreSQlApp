@@ -1,6 +1,6 @@
 import sys
-from Application import Application
-from MainWindow import MainWindow
+from src.core.Application import Application
+from src.ui.MainWindow import MainWindow
 
 app = Application(sys.argv)
 
