@@ -3,14 +3,16 @@ from PyQt6.QtSql import QSqlDatabase
 from src.config import Settings as St
 
 
-class Connection():
+class Connection:
     """Класс подключения базы данных."""
 
     # * Сделано по быстрому на время.
     # TODO переделать колхоз класс, в нормальный.
 
     # Конструктор класса.
-    def __init__(self):
+    def __init__(self, lg):
+        self.lg = lg
+        self.lg.debug("Constructor class Connection launched!")
         # Получение данных из файла.
         self.st = St.Settings()
         self.st.load_from_file()

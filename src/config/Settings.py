@@ -3,17 +3,16 @@ import json
 from pathlib import Path
 import os
 
-# Константы для работы класса.
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-SAVE_DIR = Path(f"{CURRENT_DIR}/settings/")
-SAVE_FILE = Path(f"{SAVE_DIR}/db_settings.json")
-
 
 class Settings:
     """Класс базовых настроек для программы."""
 
     # Конструктор класса.
     def __init__(self):
+        self.CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+        self.SAVE_DIR = Path(f"{self.CURRENT_DIR}/settings/")
+        self.SAVE_FILE = Path(f"{self.SAVE_DIR}/db_settings.json")
+
         # Начальный словарь настроек.
         self.settings = {}
         self._initialize_files()
