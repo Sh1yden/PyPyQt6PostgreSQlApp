@@ -5,8 +5,7 @@ import os
 
 # Константы для работы класса.
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(os.path.dirname(CURRENT_DIR))
-SAVE_DIR = Path(os.path.join(PROJECT_DIR, "media"))
+SAVE_DIR = Path(f"{CURRENT_DIR}/settings/")
 SAVE_FILE = Path(f"{SAVE_DIR}/db_settings.json")
 
 
