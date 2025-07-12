@@ -1,6 +1,3 @@
-# TODO доделать класс логер для приложения.
-# TODO залогировать тут всё.
-# TODO добавить лвл логирования. +- сделано
 import datetime
 from pathlib import Path
 import json
@@ -14,23 +11,21 @@ class Logger:
     _instanse = None # Хранит единственный экземпляр.
     _initialized = False # Флаг на единственную инициализацию.
 
+    # Создание единого объекта класса.
     def __new__(cls):
-        # Создание объекта
         if cls._instanse is None:
-            # Если экземпляра класса нету создаём.
+            # Если экземпляра класса нет создаём.
             cls._instanse = super().__new__(cls)
 
         return cls._instanse
+
     # Конструктор класса.
     def __init__(self):
         if not Logger._initialized:
             # Успешная инициализация конструктора и класса.
             Logger._initialized = True
-            # TODO поменять на функцию
-            # ! Выбор уровня логирования
-            self.LOG_LVL = 50
 
-            # Указание файловой системы для программы
+            # Указание файловой системы для программы.
             # Общие папки.
             self.CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
             self.PROJECT_DIR = os.path.dirname(os.path.dirname(self.CURRENT_DIR))
@@ -48,19 +43,30 @@ class Logger:
             self.SAVE_DIR_SET = Path(f"{self.PROJECT_DIR}/src/config/settings/")
             self.SAVE_SET = Path(f"{self.SAVE_DIR_SET}/lg_settings.json")
 
+            # ! Выбор уровня логирования
+            self.LOG_ALL_SET = self.lvl_log()
+            self.LOG_LVL = self.LOG_ALL_SET["lg_settings"]["lg_lvl_set"]
+
+            # Ошибки.
             # * Защита от рекурсии и прочих внутренних ошибок.
             # Которая включается сама при возникновении ошибок.
             # ! Файлы логов при внутренних ошибках класса не сохраняются смотреть в консоли!!!
             self._internal_error_occurred = False
 
+            # Работа с файлами.
             # Словарь хранения логов и настроек на время выполнения программы.
             self.set_var = {}
             self.log_var = {}
             self._initialize_files()
 
-    def lvl_log(self, lvl: int):
-        # TODO сделать функцию которая принимает данные из файла и ставить их в логгер.
-        pass
+    def lvl_log(self):
+        """Функция, которая принимает данные из файла и ставит их в логер."""
+        try:
+            self._load_from_set()
+            return self.set_var
+        except Exception as e:
+            self._internal_error_occurred = True
+            self.critical(f"Logger internal error: {e}. In DEF lvl_log()")
 
     def _name_of_logs(self):
         """Создание имени для логов."""
@@ -175,23 +181,23 @@ class Logger:
 
     # Уровни логов.
     def debug(self, message="TEST, INPUT VALUE!!!", tag="DEBUG"):
-        if self.LOG_LVL >= 10:
+        if self.LOG_LVL >= self.LOG_ALL_SET["lg_settings"]["DEBUG"]:
             self._univ_log(message=message, tag=tag)
 
     def info(self, message="TEST, INPUT VALUE!!!", tag="INFO"):
-        if self.LOG_LVL >= 20:
+        if self.LOG_LVL >= self.LOG_ALL_SET["lg_settings"]["INFO"]:
             self._univ_log(message=message, tag=tag)
 
     def warning(self, message="TEST, INPUT VALUE!!!", tag="WARN"):
-        if self.LOG_LVL >= 30:
+        if self.LOG_LVL >= self.LOG_ALL_SET["lg_settings"]["WARNING"]:
             self._univ_log(message=message, tag=tag)
 
     def error(self, message="TEST, INPUT VALUE!!!", tag="ERROR"):
-        if self.LOG_LVL >= 40:
+        if self.LOG_LVL >= self.LOG_ALL_SET["lg_settings"]["ERROR"]:
             self._univ_log(message=message, tag=tag)
 
     def critical(self, message="TEST, INPUT VALUE!!!", tag="CRIT"):
-        if self.LOG_LVL >= 50:
+        if self.LOG_LVL >= self.LOG_ALL_SET["lg_settings"]["CRITICAL"]:
             self._univ_log(message=message, tag=tag)
 
 

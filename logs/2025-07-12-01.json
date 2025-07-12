@@ -1,8 +1,9 @@
 {
-  "[05:56:37.495239] [DEBUG]": "Logger created at Application.",
-  "[05:56:37.495724] [DEBUG]": "Constructor class Connection launched!",
-  "[05:56:37.496240] [DEBUG]": "Settings logger added!!!",
-  "[05:56:37.496943] [DEBUG]": "localhost",
-  "[05:56:37.542739] [DEBUG]": "Connected to database",
-  "[05:56:37.543312] [DEBUG]": "self.con created"
+  "[16:15:22.624112] [DEBUG]": "Constructor launched in class Application.",
+  "[16:15:22.624493] [DEBUG]": "Logger created in class Application().",
+  "[16:15:22.647950] [DEBUG]": "Constructor launched in class Connection.",
+  "[16:15:22.648591] [DEBUG]": "Logger created in class Connection().",
+  "[16:15:22.649145] [DEBUG]": "Constructor launched in class Settings().",
+  "[16:15:22.649704] [DEBUG]": "Logger created in class Settings().",
+  "[16:15:22.696254] [DEBUG]": "Connected to DB"
 }
