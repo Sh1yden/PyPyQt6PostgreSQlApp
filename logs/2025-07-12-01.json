@@ -1,0 +1,8 @@
+{
+  "[05:56:37.495239] [DEBUG]": "Logger created at Application.",
+  "[05:56:37.495724] [DEBUG]": "Constructor class Connection launched!",
+  "[05:56:37.496240] [DEBUG]": "Settings logger added!!!",
+  "[05:56:37.496943] [DEBUG]": "localhost",
+  "[05:56:37.542739] [DEBUG]": "Connected to database",
+  "[05:56:37.543312] [DEBUG]": "self.con created"
+}

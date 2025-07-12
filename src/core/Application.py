@@ -10,6 +10,6 @@ class Application(QApplication):
         self.lg = Logger()
         self.lg.debug("Logger created at Application.")
 
-        self.con = Connection(lg=self.lg)
+        self.con = Connection()
         self.lg.debug("self.con created")
 

@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtSql import QSqlDatabase
 from src.config import Settings as St
+from src.core.Logger import Logger
 
 
 class Connection:
@@ -10,8 +11,8 @@ class Connection:
     # TODO переделать колхоз класс, в нормальный.
 
     # Конструктор класса.
-    def __init__(self, lg):
-        self.lg = lg
+    def __init__(self):
+        self.lg = Logger()
         self.lg.debug("Constructor class Connection launched!")
         # Получение данных из файла.
         self.st = St.Settings()
@@ -20,7 +21,7 @@ class Connection:
         self.connect(self.st)
 
     def connect(self, st):
-        print(st.settings["db_settings"]["db_host_name"])
+        self.lg.debug(st.settings["db_settings"]["db_host_name"])
         # Не подлючение к базе данных, а задание параметров для неё.
         db = QSqlDatabase.addDatabase("QPSQL")
         db.setHostName(st.settings["db_settings"]["db_host_name"])
@@ -33,6 +34,6 @@ class Connection:
         # Отладка.
         # TODO переделать через класс логер.
         if ok:
-            print("Connected to database", file=sys.stderr)
+            self.lg.debug("Connected to database")
         else:
-            print("Connection FAILED", file=sys.stderr)
+            self.lg.debug("Connection FAILED")

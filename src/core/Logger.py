@@ -11,34 +11,52 @@ import sys
 class Logger:
     """Класс логирования программы."""
 
+    _instanse = None # Хранит единственный экземпляр.
+    _initialized = False # Флаг на единственную инициализацию.
+
+    def __new__(cls):
+        # Создание объекта
+        if cls._instanse is None:
+            # Если экземпляра класса нету создаём.
+            cls._instanse = super().__new__(cls)
+
+        return cls._instanse
     # Конструктор класса.
     def __init__(self):
-        # TODO поменять на функцию
-        # ! Выбор уровня логирования
-        self.LOG_LVL = 50
+        if not Logger._initialized:
+            # Успешная инициализация конструктора и класса.
+            Logger._initialized = True
+            # TODO поменять на функцию
+            # ! Выбор уровня логирования
+            self.LOG_LVL = 50
 
-        # Указание файловой системы для программы
-        # Общие папки.
-        self.CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-        self.PROJECT_DIR = os.path.dirname(os.path.dirname(self.CURRENT_DIR))
+            # Указание файловой системы для программы
+            # Общие папки.
+            self.CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+            self.PROJECT_DIR = os.path.dirname(os.path.dirname(self.CURRENT_DIR))
 
-        # Логи.
-        self.SAVE_DIR_LOG = Path(os.path.join(self.PROJECT_DIR, "logs"))
+            # Логи.
+            self.SAVE_DIR_LOG = Path(os.path.join(self.PROJECT_DIR, "logs"))
 
-        # Текущая дата.
-        self.DATE = f"{datetime.datetime.now().strftime('%Y-%m-%d')}"
+            # Текущая дата.
+            self.DATE = f"{datetime.datetime.now().strftime('%Y-%m-%d')}"
 
-        # Имя файла логов на время выполнения программы, чтобы новые не создавать.
-        self.SAVE_LOG = self._name_of_logs()
+            # Имя файла логов на время выполнения программы, чтобы новые не создавать.
+            self.SAVE_LOG = self._name_of_logs()
 
-        # Настройки.
-        self.SAVE_DIR_SET = Path(f"{self.PROJECT_DIR}/src/config/settings/")
-        self.SAVE_SET = Path(f"{self.SAVE_DIR_SET}/lg_settings.json")
+            # Настройки.
+            self.SAVE_DIR_SET = Path(f"{self.PROJECT_DIR}/src/config/settings/")
+            self.SAVE_SET = Path(f"{self.SAVE_DIR_SET}/lg_settings.json")
 
-        # Словарь хранения логов на время выполнения программы.
-        self.set_var = {}
-        self.log_var = {}
-        self._initialize_files()
+            # * Защита от рекурсии и прочих внутренних ошибок.
+            # Которая включается сама при возникновении ошибок.
+            # ! Файлы логов при внутренних ошибках класса не сохраняются смотреть в консоли!!!
+            self._internal_error_occurred = False
+
+            # Словарь хранения логов и настроек на время выполнения программы.
+            self.set_var = {}
+            self.log_var = {}
+            self._initialize_files()
 
     def lvl_log(self, lvl: int):
         # TODO сделать функцию которая принимает данные из файла и ставить их в логгер.
@@ -65,7 +83,8 @@ class Logger:
 
             return save_file_name
         except Exception as e:
-            print(e)
+            self._internal_error_occurred = True
+            self.critical(f"Logger internal error: {e}. In DEF _name_of_logs()")
 
     def _initialize_files(self):
         """Инициализация файлов и директорий для программы."""
@@ -95,7 +114,8 @@ class Logger:
             if not self.SAVE_LOG.exists():
                 self._save_to_log()
         except Exception as e:
-            pass
+            self._internal_error_occurred = True
+            self.critical(f"Logger internal error: {e}. In DEF _initialize_files()")
 
     def _load_from_set(self):
         """Загрузка данных с файла логов."""
@@ -103,7 +123,8 @@ class Logger:
             with open(self.SAVE_SET, "r") as f:
                 self.set_var = json.load(f)
         except Exception as e:
-            pass
+            self._internal_error_occurred = True
+            self.critical(f"Logger internal error: {e}. In DEF _load_from_set()")
 
     def _save_to_set(self):
         """Загрузка в файл логов."""
@@ -111,7 +132,8 @@ class Logger:
             with open(self.SAVE_SET, "w") as f:
                 json.dump(self.set_var, f, indent=2)
         except Exception as e:
-            pass
+            self._internal_error_occurred = True
+            self.critical(f"Logger internal error: {e}. In DEF _save_to_set()")
 
     def _load_from_log(self):
         """Загрузка данных с файла логов."""
@@ -119,27 +141,37 @@ class Logger:
             with open(self.SAVE_LOG, "r") as f:
                 self.log_var = json.load(f)
         except Exception as e:
-            pass
+            self._internal_error_occurred = True
+            self.error(f"Logger internal error: {e}. In DEF _load_from_log()")
 
     def _save_to_log(self):
         """Загрузка в файл логов."""
         try:
-            with open(self.SAVE_LOG, "w") as f:
+            # Место для проверки внутренних ошибок. Заменить self.SAVE_LOG например на "".
+            with open(self.SAVE_LOG, "w") as f: # !
                 json.dump(self.log_var, f, indent=2)
         except Exception as e:
-            pass
+            self._internal_error_occurred = True
+            self.error(f"Logger internal error: {e}. In DEF _save_to_log()")
 
     # Универсальный шаблон, чтобы не повторять код.
     def _univ_log(self, message: str, tag: str):
+        # Защита от внутренних ошибок класса.
+        # + Защита от рекурсии.
+        if self._internal_error_occurred:
+            current_time = datetime.datetime.now().strftime('%H:%M:%S.%f')
+            print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
+            return
         try:
-            current_time = datetime.datetime.now().strftime('%H:%M:%S')
+            current_time = datetime.datetime.now().strftime('%H:%M:%S.%f')
             print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
 
             self._load_from_log()
             self.log_var.update({f"[{current_time}] [{tag}]": f"{message}"})
             self._save_to_log()
         except Exception as e:
-            pass
+            self._internal_error_occurred = True
+            print(f"Logger internal error: {e}. In DEF _univ_log()", file=sys.stderr)
 
     # Уровни логов.
     def debug(self, message="TEST, INPUT VALUE!!!", tag="DEBUG"):
