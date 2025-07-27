@@ -1,0 +1,12 @@
+{
+  "[04:20:51.644035] [DEBUG]": "Constructor launched in class Application.",
+  "[04:20:51.644548] [DEBUG]": "Logger created in class Application().",
+  "[04:20:51.674142] [DEBUG]": "Constructor launched in class Connection.",
+  "[04:20:51.674858] [DEBUG]": "Logger created in class Connection().",
+  "[04:20:51.731680] [DEBUG]": "Connected to DB",
+  "[04:20:51.737774] [DEBUG]": "Constructor launched in class TableView.",
+  "[04:20:51.738310] [DEBUG]": "Logger created in class TableView().",
+  "[04:20:51.744457] [DEBUG]": "UI initialized in TableView.",
+  "[04:20:51.754290] [DEBUG]": "Table view configured successfully.",
+  "[04:20:51.754914] [DEBUG]": "Model setup completed for table Teacher."
+}

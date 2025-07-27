@@ -1,9 +1,0 @@
-{
-  "[16:15:22.624112] [DEBUG]": "Constructor launched in class Application.",
-  "[16:15:22.624493] [DEBUG]": "Logger created in class Application().",
-  "[16:15:22.647950] [DEBUG]": "Constructor launched in class Connection.",
-  "[16:15:22.648591] [DEBUG]": "Logger created in class Connection().",
-  "[16:15:22.649145] [DEBUG]": "Constructor launched in class Settings().",
-  "[16:15:22.649704] [DEBUG]": "Logger created in class Settings().",
-  "[16:15:22.696254] [DEBUG]": "Connected to DB"
-}

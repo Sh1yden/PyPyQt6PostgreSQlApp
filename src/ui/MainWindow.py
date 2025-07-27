@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QMessageBox
 from PyQt6.QtCore import pyqtSlot  # Slot функция реагирует на действие в программе.
 from src.ui.MainMenu import MainMenu
+from src.ui.widgets.TableView import TableView
 
 
 class MainWindow(QMainWindow):
@@ -19,6 +20,9 @@ class MainWindow(QMainWindow):
         # Настройка кнопок.
         main_menu.about.triggered.connect(self.about)
         main_menu.about_qt.triggered.connect(self.about_qt)
+        # Создание и установка TableView как центрального виджета.
+        self.table_view = TableView("Teacher")  # ! Имя таблицы в БД.
+        self.setCentralWidget(self.table_view)
 
     @pyqtSlot()  # Декоратор, чтобы показать что это именно слот, а не просто функция.
     def about(self):
