@@ -1,3 +1,4 @@
+# TODO Переписать на psycopg2 или удалить к хуям
 from PyQt6.QtSql import QSqlDatabase
 from src.core.Logger import Logger
 import json
@@ -61,16 +62,16 @@ class Connection:
             self._load_from_file()
             # Не подлючение к базе данных, а задание параметров для неё.
             db = QSqlDatabase.addDatabase("QPSQL")
-            db.setHostName(self.db_set_var["db_settings"]["db_host_name"])
-            db.setDatabaseName(self.db_set_var["db_settings"]["db_name"])
-            db.setPort(self.db_set_var["db_settings"]["db_port"])
-            db.setUserName(self.db_set_var["db_settings"]["db_user"])
-            db.setPassword(self.db_set_var["db_settings"]["db_password"])
+            db.setHostName(self.db_set_var["host"])
+            db.setDatabaseName(self.db_set_var["dbname"])
+            db.setPort(self.db_set_var["port"])
+            db.setUserName(self.db_set_var["user"])
+            db.setPassword(self.db_set_var["password"])
             # Подключение к базе данных.
             ok = db.open()
             if ok:
-                self.lg.debug("Connected to DB")
+                self.lg.debug("Connection Connected to DB. In DEF connect_db()")
             else:
-                self.lg.error("Connection FAILED")
+                self.lg.error("Connection Connection FAILED. In DEF connect_db()")
         except Exception as e:
             self.lg.critical(f"Connection internal error: {e}. In DEF connect_db()")

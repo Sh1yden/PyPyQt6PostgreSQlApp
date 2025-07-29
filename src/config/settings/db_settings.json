@@ -1,9 +1,7 @@
 {
-  "db_settings": {
-    "db_host_name": "localhost",
-    "db_name": "Shcool App",
-    "db_port": 5432,
-    "db_user": "postgres",
-    "db_password": "345627"
-  }
+    "host": "localhost",
+    "dbname": "Shcool App",
+    "port": 5432,
+    "user": "postgres",
+    "password": "345627"
 }
