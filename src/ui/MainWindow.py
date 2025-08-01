@@ -23,28 +23,27 @@ class MainWindow(QMainWindow):
         main_menu.add.triggered.connect(self.add)
         main_menu.update.triggered.connect(self.uppdate)
         main_menu.delete.triggered.connect(self.delete)
-
         # Меню помощи.
         main_menu.about.triggered.connect(self.about)
         main_menu.about_qt.triggered.connect(self.about_qt)
+
         # Создание и установка TableView как центрального виджета.
-        self.table_view = TableView("Teacher")  # ! Имя таблицы в БД.
+        self.table_view = TableView()
         self.setCentralWidget(self.table_view)
+
+        self.teacher_view = View()
 
     @pyqtSlot()
     def add(self):
-        teacher = View()
-        teacher.add()
+        self.teacher_view.add()
 
     @pyqtSlot()
     def uppdate(self):
-        teacher = View()
-        teacher.uppdate()
+        self.teacher_view.uppdate()
 
     @pyqtSlot()
     def delete(self):
-        teacher = View()
-        teacher.delete()
+        self.teacher_view.delete()
 
     @pyqtSlot()  # Декоратор, чтобы показать что это именно слот, а не просто функция.
     def about(self):

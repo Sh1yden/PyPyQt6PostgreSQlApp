@@ -24,24 +24,21 @@ class Model(QSqlQueryModel):
         self.lg.debug("Logger created in class Model().")
 
         self.condb = Connection()
-        self.tabview = TableView("Teacher")  # ! Имя таблицы в БД.
+        self.tabv = TableView()
 
     # ! Может выдавать ошибку если не ввести данные!!!
     def add(self, fio, phone, email, comment):
         try:
-            conn = psycopg2.connect(**self.condb.db_set_var)
-
-            if conn:
-                self.lg.debug("Model Connected to DB with psycopg2. In DEF connect_db()")
-            else:
-                self.lg.error("Model Connection FAILED with psycopg2. In DEF connect_db()")
-                return
-
+            # TODO connection to db добавить сюда нахуй
+            conn = self.condb.connect_to_db()
             cursor = conn.cursor()
             data = (fio, phone, email, comment)
             cursor.execute(INSERT, data)
             conn.commit()
             # ! будущее место для обновления
+            self.tabv.load_data("""
+       SELECT * FROM "Teacher"
+       """)
             conn.close()
         except Exception as e:
             self.lg.critical(f"Model internal error: {e}. In DEF add()")
@@ -50,12 +47,12 @@ class Model(QSqlQueryModel):
 class View(QTableView):
 
     def __init__(self, parent=None):
+        super().__init__(parent)
+
         # Инициализация логера.
         self.lg = Logger()
         self.lg.debug("Constructor launched in class View.")
         self.lg.debug("Logger created in class View().")
-
-        super().__init__(parent)
 
         model = Model(parent=self)
         self.setModel(model)
@@ -79,12 +76,12 @@ class View(QTableView):
 class Dialog(QDialog):
 
     def __init__(self, parent=None):
+        super().__init__(parent)
+
         # Инициализация логера.
         self.lg = Logger()
         self.lg.debug("Constructor launched in class Dialog.")
         self.lg.debug("Logger created in class Dialog().")
-
-        super().__init__(parent)
 
         fio_lbl = QLabel("Surname N. P.", parent=self)
         self.__fio_edit = QLineEdit(parent=self)

@@ -1,5 +1,6 @@
-# TODO Переписать на psycopg2 или удалить к хуям
-from PyQt6.QtSql import QSqlDatabase
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
 from src.core.Logger import Logger
 import json
 from pathlib import Path
@@ -27,7 +28,8 @@ class Connection:
         # Работа с файлами.
         self.db_set_var = {}
         self._initialize_files()
-        self.con_db()
+
+        self.connection = None
 
     def _initialize_files(self):
         """Инициализация файлов и директорий для программы."""
@@ -57,21 +59,41 @@ class Connection:
         except Exception as e:
             self.lg.critical(f"Connection internal error: {e}. In DEF _save_to_file()")
 
-    def con_db(self):
+    def connect_to_db(self):
+        """Соединение к базе данных."""
         try:
-            self._load_from_file()
-            # Не подлючение к базе данных, а задание параметров для неё.
-            db = QSqlDatabase.addDatabase("QPSQL")
-            db.setHostName(self.db_set_var["host"])
-            db.setDatabaseName(self.db_set_var["dbname"])
-            db.setPort(self.db_set_var["port"])
-            db.setUserName(self.db_set_var["user"])
-            db.setPassword(self.db_set_var["password"])
-            # Подключение к базе данных.
-            ok = db.open()
-            if ok:
-                self.lg.debug("Connection Connected to DB. In DEF connect_db()")
-            else:
-                self.lg.error("Connection Connection FAILED. In DEF connect_db()")
+            if not self.connection or self.connection.closed:
+                # загрузка настроек подключения к бд
+                self._load_from_file()
+                # Подключение к базе данных.
+                self.connection = psycopg2.connect(**self.db_set_var)
+                self.lg.debug("Connection Connected to DB. In DEF connect_to_db()")
+            return self.connection
         except Exception as e:
-            self.lg.critical(f"Connection internal error: {e}. In DEF connect_db()")
+            self.lg.critical(f"Connection internal error: {e}. In DEF connect_to_db()")
+
+    def execute_query(self, query, params=None):
+        """Выполнение запроса."""
+        try:
+            with self.connect_to_db() as conn:
+                with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                    cursor.execute(query, params)
+                    return cursor.fetchall()
+        except Exception as e:
+            self.lg.error(f"Connection internal error: {e}. In DEF execute_query()")
+
+    def close_connection(self):
+        """Закрытие соединения базы данных."""
+        try:
+            if self.connection:
+                self.connection.close()
+                self.lg.debug("Connection Connection CLOSED. In DEF close_connection()")
+        except Exception as e:
+            self.lg.error(f"Connection internal error: {e}. In DEF close_connection()")
+
+
+if __name__ == '__main__':
+    connection_to_db = Connection()
+    connection_to_db.connect_to_db()
+    connection_to_db.execute_query()
+    connection_to_db.close_connection()
