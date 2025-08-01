@@ -1,7 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow, QMessageBox
 from PyQt6.QtCore import pyqtSlot  # Slot функция реагирует на действие в программе.
 from src.ui.MainMenu import MainMenu
-from src.ui.widgets.TableView import TableView
 from src.controllers.Teacher import View
 
 
@@ -18,32 +17,19 @@ class MainWindow(QMainWindow):
         # Parent=self установка родительского окна для главного меню.
         main_menu = MainMenu(parent=self)
         self.setMenuBar(main_menu)  # установка главного меню для окна.
+
+        # Создание и установка Teacher.View как центрального виджета.
+        self.teacher_view = View()
+        self.setCentralWidget(self.teacher_view)
+
         # Настройка кнопок.
         # Меню Учителя.
-        main_menu.add.triggered.connect(self.add)
-        main_menu.update.triggered.connect(self.uppdate)
-        main_menu.delete.triggered.connect(self.delete)
+        main_menu.add.triggered.connect(self.teacher_view.add)
+        main_menu.update.triggered.connect(self.teacher_view.update)
+        main_menu.delete.triggered.connect(self.teacher_view.delete)
         # Меню помощи.
         main_menu.about.triggered.connect(self.about)
         main_menu.about_qt.triggered.connect(self.about_qt)
-
-        # Создание и установка TableView как центрального виджета.
-        self.table_view = TableView()
-        self.setCentralWidget(self.table_view)
-
-        self.teacher_view = View()
-
-    @pyqtSlot()
-    def add(self):
-        self.teacher_view.add()
-
-    @pyqtSlot()
-    def uppdate(self):
-        self.teacher_view.uppdate()
-
-    @pyqtSlot()
-    def delete(self):
-        self.teacher_view.delete()
 
     @pyqtSlot()  # Декоратор, чтобы показать что это именно слот, а не просто функция.
     def about(self):

@@ -1,11 +1,11 @@
-from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtSql import QSqlQueryModel, QSqlDatabase, QSqlQuery
-from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QLabel, QHBoxLayout
+from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QLabel, QHBoxLayout, QTableWidget, QTableWidgetItem
 from PyQt6.QtWidgets import QLineEdit, QTextEdit, QPushButton, QVBoxLayout
 import psycopg2
 from src.core.Logger import Logger
 from src.database.Connection import Connection
-from src.ui.widgets.TableView import TableView
 
 
 INSERT = """
@@ -13,7 +13,10 @@ INSERT = """
         values ( %s, %s, %s, %s ) ;
 """
 
-class Model(QSqlQueryModel):
+class Model(QStandardItemModel):
+
+    # Добавьте сигнал
+    data_changed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -24,22 +27,51 @@ class Model(QSqlQueryModel):
         self.lg.debug("Logger created in class Model().")
 
         self.condb = Connection()
-        self.tabv = TableView()
+        self.refresh_data()
+
+    def refresh_data(self):
+        """Загрузка данных из БД в модель"""
+        try:
+            rows = self.condb.execute_query("""SELECT * FROM "Teacher" ORDER by id""")
+
+            # Очищаем таблицу перед загрузкой
+            self.clear()
+            self.setRowCount(0)
+            self.setColumnCount(0)
+
+            if rows:
+                # Получаем названия колонок
+                columns = list(rows[0].keys())
+
+                # Настраиваем размеры таблицы
+                self.setRowCount(len(rows))
+                self.setColumnCount(len(columns))
+                self.setHorizontalHeaderLabels(columns)
+
+                # Заполняем данными
+                for row_idx, row in enumerate(rows):
+                    for col_idx, column_name in enumerate(columns):
+                        cell_value = row[column_name]
+                        item = QStandardItem(str(cell_value) if cell_value is not None else "")
+                        self.setItem(row_idx, col_idx, item)
+
+                self.lg.debug("Model refresh data successfully. In DEF refresh_data()")
+        except psycopg2.Error as e:
+            self.lg.error(f"Model internal error: {e}. In DEF refresh_data()")
+        except Exception as e:
+            self.lg.critical(f"Model internal error: {e}. In DEF refresh_data()")
 
     # ! Может выдавать ошибку если не ввести данные!!!
     def add(self, fio, phone, email, comment):
         try:
-            # TODO connection to db добавить сюда нахуй
             conn = self.condb.connect_to_db()
             cursor = conn.cursor()
             data = (fio, phone, email, comment)
             cursor.execute(INSERT, data)
             conn.commit()
-            # ! будущее место для обновления
-            self.tabv.load_data("""
-       SELECT * FROM "Teacher"
-       """)
             conn.close()
+            self.refresh_data()
+            self.lg.debug("Model add data successfully. In DEF add()")
         except Exception as e:
             self.lg.critical(f"Model internal error: {e}. In DEF add()")
 
@@ -54,8 +86,24 @@ class View(QTableView):
         self.lg.debug("Constructor launched in class View.")
         self.lg.debug("Logger created in class View().")
 
-        model = Model(parent=self)
-        self.setModel(model)
+        self.teacher_model = Model(parent=self)
+        self.setModel(self.teacher_model)
+
+        self.setup_table_view()
+
+    def setup_table_view(self):
+        """Настройка внешнего вида таблицы"""
+        # Растягиваем колонки по содержимому
+        self.resizeColumnsToContents()
+
+        # Разрешаем выделение строк
+        self.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
+
+        # Запрещаем редактирование напрямую в таблице
+        self.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+
+        # Включаем сортировку
+        self.setSortingEnabled(True)
 
     def add(self):
         # Заглушка
