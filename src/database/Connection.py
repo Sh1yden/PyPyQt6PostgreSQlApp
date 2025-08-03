@@ -1,10 +1,7 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-
 from src.core.Logger import Logger
-import json
-from pathlib import Path
-import os
+from src.config.AppConfig import AppConfig
 
 
 class Connection:
@@ -17,56 +14,21 @@ class Connection:
         self.lg.debug("Constructor launched in class Connection.")
         self.lg.debug("Logger created in class Connection().")
 
-        # Указание файловой системы для программы.
-        # Общие папки.
-        self.CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-        self.PROJECT_DIR = os.path.dirname(os.path.dirname(self.CURRENT_DIR))
-        self.SAVE_DIR_DB = Path(f"{self.PROJECT_DIR}/src/config/settings/")
-        # Файл настроек.
-        self.SAVE_FILE_DB = Path(f"{self.SAVE_DIR_DB}/db_settings.json")
-
-        # Работа с файлами.
-        self.db_set_var = {}
-        self._initialize_files()
+        # Работа с файлами программы
+        self.appcfg = AppConfig()
 
         self.connection = None
-
-    def _initialize_files(self):
-        """Инициализация файлов и директорий для программы."""
-        try:
-            # Создаём директорию.
-            self.SAVE_DIR_DB.mkdir(parents=True, exist_ok=True)
-            # Если файла нет, создаём новый.
-            if not self.SAVE_FILE_DB.exists():
-                self._save_to_file()
-        except Exception as e:
-            self.lg.critical(f"Connection internal error: {e}. In DEF _initialize_files()")
-
-    def _load_from_file(self):
-        """Загрузка данных из файла настроек."""
-        try:
-            with open(self.SAVE_FILE_DB, "r") as f:
-                self.db_set_var = json.load(f)
-        except Exception as e:
-            self.lg.critical(f"Connection internal error: {e}. In DEF load_from_file()")
-
-    def _save_to_file(self):
-        """Загрузка данных в файл настроек."""
-        try:
-            # TODO сделать авто ввод данных бд на выбор, либо пользователь, либо авто
-            with open(self.SAVE_FILE_DB, "w") as f:
-                json.dump(self.db_set_var, f, indent=2)
-        except Exception as e:
-            self.lg.critical(f"Connection internal error: {e}. In DEF _save_to_file()")
 
     def connect_to_db(self):
         """Соединение к базе данных."""
         try:
             if not self.connection or self.connection.closed:
-                # загрузка настроек подключения к бд
-                self._load_from_file()
                 # Подключение к базе данных.
-                self.connection = psycopg2.connect(**self.db_set_var)
+                self.connection = (
+                    psycopg2.connect(
+                        **self.appcfg.load_from_file(self.appcfg.SAVE_SET_DB_FILE)
+                    )
+                )
                 self.lg.debug("Connection Connected to DB. In DEF connect_to_db()")
             return self.connection
         except Exception as e:
@@ -95,5 +57,5 @@ class Connection:
 if __name__ == '__main__':
     connection_to_db = Connection()
     connection_to_db.connect_to_db()
-    connection_to_db.execute_query()
+    # connection_to_db.execute_query()
     connection_to_db.close_connection()

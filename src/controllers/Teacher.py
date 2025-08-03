@@ -1,7 +1,6 @@
 from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
-from PyQt6.QtSql import QSqlQueryModel, QSqlDatabase, QSqlQuery
-from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QLabel, QHBoxLayout, QTableWidget, QTableWidgetItem
+from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QLabel, QHBoxLayout
 from PyQt6.QtWidgets import QLineEdit, QTextEdit, QPushButton, QVBoxLayout
 import psycopg2
 from src.core.Logger import Logger

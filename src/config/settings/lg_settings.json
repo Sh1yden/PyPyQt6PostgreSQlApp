@@ -1,10 +1,9 @@
 {
-  "lg_settings" : {
-    "lg_lvl_set" : 50,
-    "DEBUG" : 10,
-    "INFO" : 20,
-    "WARNING": 30,
-    "ERROR": 40,
-    "CRITICAL": 50
-  }
+  "lg_lvl_set": 10,
+  "OFF": 0,
+  "DEBUG": 10,
+  "INFO": 20,
+  "WARNING": 30,
+  "ERROR": 40,
+  "CRITICAL": 50
 }
