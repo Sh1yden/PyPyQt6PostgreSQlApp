@@ -1,10 +1,16 @@
 from PyQt6.QtWidgets import QMenuBar
+from src.core.Logger import Logger
 
 
 class MainMenu(QMenuBar):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        # Инициализация логера.
+        self.lg = Logger()
+        self.lg.debug("Constructor launched in class MainMenu.")
+        self.lg.debug("Logger created in class MainMenu().")
 
         teacher_menu = self.addMenu("Teacher")
         self.add = teacher_menu.addAction("Add")

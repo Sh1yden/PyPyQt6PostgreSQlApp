@@ -26,13 +26,13 @@ class Connection:
                 # Подключение к базе данных.
                 self.connection = (
                     psycopg2.connect(
-                        **self.appcfg.load_from_file(self.appcfg.SAVE_SET_DB_FILE)
+                        **self.appcfg.load_from_file(self.appcfg.save_set_db_file)
                     )
                 )
-                self.lg.debug("Connection Connected to DB. In DEF connect_to_db()")
+                self.lg.debug("Connection Connected to DB. In DEF connect_to_db().")
             return self.connection
         except Exception as e:
-            self.lg.critical(f"Connection internal error: {e}. In DEF connect_to_db()")
+            self.lg.critical(f"Connection internal error: {e}. In DEF connect_to_db().")
 
     def execute_query(self, query, params=None):
         """Выполнение запроса."""
@@ -40,18 +40,23 @@ class Connection:
             with self.connect_to_db() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                     cursor.execute(query, params)
-                    return cursor.fetchall()
+                    conn.commit()
+                    # ! Для исправления внутренней ошибки:
+                    # ! "Connection internal error: no results to fetch. In DEF execute_query()."
+                    # Выполняется при запросе без параметров, то есть просто для отображения таблицы
+                    if params is None:
+                        return cursor.fetchall()
         except Exception as e:
-            self.lg.error(f"Connection internal error: {e}. In DEF execute_query()")
+            self.lg.error(f"Connection internal error: {e}. In DEF execute_query().")
 
     def close_connection(self):
         """Закрытие соединения базы данных."""
         try:
             if self.connection:
                 self.connection.close()
-                self.lg.debug("Connection Connection CLOSED. In DEF close_connection()")
+                self.lg.debug("Connection Connection CLOSED. In DEF close_connection().")
         except Exception as e:
-            self.lg.error(f"Connection internal error: {e}. In DEF close_connection()")
+            self.lg.error(f"Connection internal error: {e}. In DEF close_connection().")
 
 
 if __name__ == '__main__':

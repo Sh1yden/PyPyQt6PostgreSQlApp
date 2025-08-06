@@ -32,7 +32,7 @@ class Logger:
             self._internal_error_occurred = False
 
             # Работа с файлами программы
-            self.appcfg = AppConfig()
+            self._appcfg = AppConfig()
 
             # Текущая дата.
             self._DATE = f"{datetime.datetime.now().strftime('%Y-%m-%d')}"
@@ -44,10 +44,10 @@ class Logger:
     def _name_of_logs(self):
         """Создание имени для логов."""
         try:
-            logs_list = os.listdir(self.appcfg.SAVE_LG_DIR)
+            logs_list = os.listdir(self._appcfg.save_lg_dir)
             # Если файла в директории нет задаём имя с 01.
             if len(logs_list) < 1:
-                save_file_name = Path(f"{self.appcfg.SAVE_LG_DIR}/{self._DATE}-{"01"}.json")
+                save_file_name = Path(f"{self._appcfg.save_lg_dir}/{self._DATE}-{"01"}.json")
             else:  # Иначе выдаём имя + 1 от существующего максимального в директории.
                 # Создание листа с последовательными значениями 01, 02 и т.д.
                 name_logs_list = []
@@ -57,17 +57,17 @@ class Logger:
                 # Если последовательное значение меньше 10, к числу добавляем 0, например 02.
                 if int(max(name_logs_list)) + 1 < 10:
                     save_file_name = Path(
-                        f"{self.appcfg.SAVE_LG_DIR}/{self._DATE}-0{int(max(name_logs_list)) + 1}.json"
+                        f"{self._appcfg.save_lg_dir}/{self._DATE}-0{int(max(name_logs_list)) + 1}.json"
                     )
                 else:  # Иначе просто убираем ноль.
                     save_file_name = Path(
-                        f"{self.appcfg.SAVE_LG_DIR}/{self._DATE}-{int(max(name_logs_list)) + 1}.json"
+                        f"{self._appcfg.save_lg_dir}/{self._DATE}-{int(max(name_logs_list)) + 1}.json"
                     )
 
             return save_file_name
         except Exception as e:
             self._internal_error_occurred = True
-            self.critical(f"Logger internal error: {e}. In DEF _name_of_logs()")
+            self.critical(f"Logger internal error: {e}. In DEF _name_of_logs().")
 
     # Универсальный шаблон, чтобы не повторять код.
     def _univ_log(self, message: str, tag: str):
@@ -80,33 +80,33 @@ class Logger:
         try:
             print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
 
-            self.appcfg.save_to_file(self._NAME_OF_LOG, self._lg_var)
-            self._lg_var = self.appcfg.load_from_file(self._NAME_OF_LOG)
+            self._appcfg.save_to_file(self._NAME_OF_LOG, self._lg_var)
+            self._lg_var = self._appcfg.load_from_file(self._NAME_OF_LOG)
             self._lg_var.update({f"[{current_time}] [{tag}]": f"{message}"})
-            self.appcfg.save_to_file(self._NAME_OF_LOG, self._lg_var)
+            self._appcfg.save_to_file(self._NAME_OF_LOG, self._lg_var)
         except Exception as e:
             self._internal_error_occurred = True
-            print(f"Logger internal error: {e}. In DEF _univ_log()", file=sys.stderr)
+            self.critical(f"Logger internal error: {e}. In DEF _univ_log().")
 
     # Уровни логов.
     def debug(self, message="TEST, INPUT VALUE!!!", tag="DEBUG"):
-        if self.appcfg.LG_LVL >= self.appcfg.LG_ALL_SET["DEBUG"]:
+        if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["DEBUG"]:
             self._univ_log(message=message, tag=tag)
 
     def info(self, message="TEST, INPUT VALUE!!!", tag="INFO"):
-        if self.appcfg.LG_LVL >= self.appcfg.LG_ALL_SET["INFO"]:
+        if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["INFO"]:
             self._univ_log(message=message, tag=tag)
 
     def warning(self, message="TEST, INPUT VALUE!!!", tag="WARN"):
-        if self.appcfg.LG_LVL >= self.appcfg.LG_ALL_SET["WARNING"]:
+        if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["WARNING"]:
             self._univ_log(message=message, tag=tag)
 
     def error(self, message="TEST, INPUT VALUE!!!", tag="ERROR"):
-        if self.appcfg.LG_LVL >= self.appcfg.LG_ALL_SET["ERROR"]:
+        if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["ERROR"]:
             self._univ_log(message=message, tag=tag)
 
     def critical(self, message="TEST, INPUT VALUE!!!", tag="CRIT"):
-        if self.appcfg.LG_LVL >= self.appcfg.LG_ALL_SET["CRITICAL"]:
+        if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["CRITICAL"]:
             self._univ_log(message=message, tag=tag)
 
 

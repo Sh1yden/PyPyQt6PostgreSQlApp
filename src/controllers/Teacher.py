@@ -54,25 +54,22 @@ class Model(QStandardItemModel):
                         item = QStandardItem(str(cell_value) if cell_value is not None else "")
                         self.setItem(row_idx, col_idx, item)
 
-                self.lg.debug("Model refresh data successfully. In DEF refresh_data()")
+                self.lg.debug("Model refresh data successfully. In DEF refresh_data().")
         except psycopg2.Error as e:
-            self.lg.error(f"Model internal error: {e}. In DEF refresh_data()")
+            self.lg.error(f"Model internal error: {e}. In DEF refresh_data().")
         except Exception as e:
-            self.lg.critical(f"Model internal error: {e}. In DEF refresh_data()")
+            self.lg.critical(f"Model internal error: {e}. In DEF refresh_data().")
 
     # ! Может выдавать ошибку если не ввести данные!!!
     def add(self, fio, phone, email, comment):
         try:
-            conn = self.condb.connect_to_db()
-            cursor = conn.cursor()
-            data = (fio, phone, email, comment)
-            cursor.execute(INSERT, data)
-            conn.commit()
-            conn.close()
+            self.condb.connect_to_db()
+            self.condb.execute_query(INSERT, (fio, phone, email, comment))
             self.refresh_data()
-            self.lg.debug("Model add data successfully. In DEF add()")
+            self.condb.close_connection()
+            self.lg.debug("Model add data successfully. In DEF add().")
         except Exception as e:
-            self.lg.critical(f"Model internal error: {e}. In DEF add()")
+            self.lg.critical(f"Model internal error: {e}. In DEF add().")
 
 
 class View(QTableView):
@@ -103,6 +100,8 @@ class View(QTableView):
 
         # Включаем сортировку
         self.setSortingEnabled(True)
+
+        self.lg.debug("View setup table successfully. In DEF setup_table_view().")
 
     def add(self):
         # Заглушка
@@ -163,10 +162,10 @@ class Dialog(QDialog):
     @pyqtSlot()
     def finish(self):
         if self.fio is None:
-            self.lg.debug("FIO not input")
+            self.lg.debug("Dialog not fio input. In DEF finish().")
             return
-        self.lg.debug("FIO accepted")
         self.accept()
+        self.lg.debug("Dialog self.accept(). In DEF finish().")
 
     @property
     def fio(self):
@@ -174,28 +173,35 @@ class Dialog(QDialog):
         if result == "":
             return None
         else:
+            self.lg.debug("Dialog fio successfully. In DEF fio().")
             return result
 
     @property
     def phone(self):
         result = self.__phone_edit.text().strip()
         if result == "":
+            self.lg.debug("Dialog not phone input. In DEF phone().")
             return None
         else:
+            self.lg.debug("Dialog phone successfully. In DEF phone().")
             return result
 
     @property
     def email(self):
         result = self.__email_edit.text().strip()
         if result == "":
+            self.lg.debug("Dialog not email input. In DEF email().")
             return None
         else:
+            self.lg.debug("Dialog email successfully. In DEF email().")
             return result
 
     @property
     def comment(self):
         result = self.__comment_edit.toPlainText().strip()
         if result == "":
+            self.lg.debug("Dialog not comment input. In DEF comment().")
             return None
         else:
+            self.lg.debug("Dialog comment successfully. In DEF comment().")
             return result

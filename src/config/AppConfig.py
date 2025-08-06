@@ -40,9 +40,9 @@ class AppConfig:
 
             # Логи
             # Папка для логов
-            self.SAVE_LG_DIR = Path(os.path.join(self._PROJECT_DIR, "logs"))
+            self._SAVE_LG_DIR = Path(os.path.join(self._PROJECT_DIR, "logs"))
             # Настройки логов
-            self.SAVE_SET_LG_FILE = Path(f"{self._SAVE_SET_DIR}/lg_settings.json")
+            self._SAVE_SET_LG_FILE = Path(f"{self._SAVE_SET_DIR}/lg_settings.json")
             self._LG_DEF_SET = {
                 "lg_lvl_set" : 0,
                 "OFF" : 0,
@@ -56,7 +56,7 @@ class AppConfig:
 
             # БД
             # Настройки БД
-            self.SAVE_SET_DB_FILE = Path(f"{self._SAVE_SET_DIR}/db_settings.json")
+            self._SAVE_SET_DB_FILE = Path(f"{self._SAVE_SET_DIR}/db_settings.json")
             self._DB_DEF_SET = {
                 "host": "localhost",
                 "dbname": "Shcool App",
@@ -69,8 +69,30 @@ class AppConfig:
             self._init_files()
 
             # Уровень логирования
-            self.LG_ALL_SET = self.load_from_file(self.SAVE_SET_LG_FILE)
-            self.LG_LVL = self.LG_ALL_SET["lg_lvl_set"]
+            self._LG_ALL_SET = self.load_from_file(self._SAVE_SET_LG_FILE)
+            self._LG_LVL = self._LG_ALL_SET["lg_lvl_set"]
+
+    # Логи
+    @property
+    def save_lg_dir(self):
+        return self._SAVE_LG_DIR
+
+    @property
+    def save_set_lg_file(self):
+        return self._SAVE_SET_LG_FILE
+
+    @property
+    def lg_all_set(self):
+        return self._LG_ALL_SET
+
+    @property
+    def lg_lvl(self):
+        return self._LG_LVL
+
+    # БД
+    @property
+    def save_set_db_file(self):
+        return self._SAVE_SET_DB_FILE
 
     def _init_files(self):
         """Инициализация папок и файлов для программы. Настройки, папка для логов и т.д."""
@@ -81,16 +103,16 @@ class AppConfig:
 
             # Логи
             # Если папки для логов нет
-            self.SAVE_LG_DIR.mkdir(parents=True, exist_ok=True)
+            self._SAVE_LG_DIR.mkdir(parents=True, exist_ok=True)
             # Если файла настроек нет
-            if not self.SAVE_SET_LG_FILE.exists():
-                self.save_to_file(self.SAVE_SET_LG_FILE, self._LG_DEF_SET)
+            if not self._SAVE_SET_LG_FILE.exists():
+                self.save_to_file(self._SAVE_SET_LG_FILE, self._LG_DEF_SET)
 
             # БД
             # Создание файла настроек
             # Если файла настроек нет
-            if not self.SAVE_SET_DB_FILE.exists():
-                self.save_to_file(self.SAVE_SET_DB_FILE, self._DB_DEF_SET)
+            if not self._SAVE_SET_DB_FILE.exists():
+                self.save_to_file(self._SAVE_SET_DB_FILE, self._DB_DEF_SET)
         except Exception as e:
             self._internal_error_occurred = True
 

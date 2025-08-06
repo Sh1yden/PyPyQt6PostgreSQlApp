@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QMessageBox
 from PyQt6.QtCore import pyqtSlot  # Slot функция реагирует на действие в программе.
 from src.ui.MainMenu import MainMenu
 from src.controllers.Teacher import View
+from src.core.Logger import Logger
 
 
 class MainWindow(QMainWindow):
@@ -11,6 +12,12 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         # Настройка главного окна.
         super().__init__(parent)
+
+        # Инициализация логера.
+        self.lg = Logger()
+        self.lg.debug("Constructor launched in class MainMenu.")
+        self.lg.debug("Logger created in class MainMenu().")
+
         self.setWindowTitle("Managing student assignments")
 
         # Настройка главного меню.
