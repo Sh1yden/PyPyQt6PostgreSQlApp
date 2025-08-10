@@ -1,3 +1,6 @@
+# ===== PROGRAM LOGGING CLASS / КЛАСС ЛОГИРОВАНИЯ ПРОГРАММЫ =====
+
+# ===== IMPORTS / ИМПОРТЫ =====
 import datetime
 from pathlib import Path
 import os
@@ -5,61 +8,73 @@ import sys
 from src.config.AppConfig import AppConfig
 
 
+# ===== LOGGER CLASS / КЛАСС ЛОГГЕРА =====
 class Logger:
-    """Класс логирования программы."""
+    """
+    Program logging class / Класс логирования программы
+    Singleton pattern implementation for unified logging / Реализация паттерна Singleton для унифицированного логирования
+    """
 
-    _instanse_Logger = None # Хранит единственный экземпляр.
-    _initialized_Logger = False # Флаг на единственную инициализацию.
+    # ===== SINGLETON PATTERN / ПАТТЕРН СИНГЛТОН =====
+    _instanse_Logger = None  # Stores single instance / Хранит единственный экземпляр
+    _initialized_Logger = False  # Single initialization flag / Флаг на единственную инициализацию
 
-    # Создание единого объекта класса.
+    # ===== SINGLETON CREATION / СОЗДАНИЕ СИНГЛТОНА =====
     def __new__(cls):
+        """Create single class instance / Создание единого объекта класса"""
         if cls._instanse_Logger is None:
-            # Если экземпляра класса нет создаём.
+            # If no class instance exists, create one / Если экземпляра класса нет создаём
             cls._instanse_Logger = super().__new__(cls)
-
         return cls._instanse_Logger
 
-    # Конструктор класса.
+    # ===== INITIALIZATION / ИНИЦИАЛИЗАЦИЯ =====
     def __init__(self):
+        """Class constructor / Конструктор класса"""
         if not Logger._initialized_Logger:
-            # Успешная инициализация конструктора и класса.
+            # Successful constructor and class initialization / Успешная инициализация конструктора и класса
             Logger._initialized_Logger = True
 
-            # Ошибки.
-            # * Защита от рекурсии и прочих внутренних ошибок.
-            # Которая включается сама при возникновении ошибок.
-            # ! Файлы логов при внутренних ошибках класса не сохраняются смотреть в консоли!!!
+            # ===== ERROR HANDLING / ОБРАБОТКА ОШИБОК =====
+            # Protection from recursion and other internal errors / Защита от рекурсии и прочих внутренних ошибок
+            # Activated automatically when errors occur / Которая включается сама при возникновении ошибок
+            # ! Log files are not saved for internal class errors - check console!!! / ! Файлы логов при внутренних ошибках класса не сохраняются смотреть в консоли!!!
             self._internal_error_occurred = False
 
-            # Работа с файлами программы
+            # ===== CONFIGURATION SETUP / НАСТРОЙКА КОНФИГУРАЦИИ =====
+            # Work with program files / Работа с файлами программы
             self._appcfg = AppConfig()
 
-            # Текущая дата.
+            # ===== DATE AND FILE SETUP / НАСТРОЙКА ДАТЫ И ФАЙЛОВ =====
+            # Current date / Текущая дата
             self._DATE = f"{datetime.datetime.now().strftime('%Y-%m-%d')}"
-            # Имя файла логов на время выполнения программы, чтобы новые не создавать.
+            # Log file name for program runtime, to avoid creating new ones / Имя файла логов на время выполнения программы, чтобы новые не создавать
             self._NAME_OF_LOG = self._name_of_logs()
-            # Временный буфер
+            # Temporary buffer / Временный буфер
             self._lg_var = {}
 
+    # ===== FILE MANAGEMENT / УПРАВЛЕНИЕ ФАЙЛАМИ =====
     def _name_of_logs(self):
-        """Создание имени для логов."""
+        """Create log file name / Создание имени для логов"""
         try:
             logs_list = os.listdir(self._appcfg.save_lg_dir)
-            # Если файла в директории нет задаём имя с 01.
+            
+            # If no files in directory, set name with 01 / Если файла в директории нет задаём имя с 01
             if len(logs_list) < 1:
                 save_file_name = Path(f"{self._appcfg.save_lg_dir}/{self._DATE}-{"01"}.json")
-            else:  # Иначе выдаём имя + 1 от существующего максимального в директории.
-                # Создание листа с последовательными значениями 01, 02 и т.д.
+            else:
+                # Otherwise give name + 1 from existing maximum in directory / Иначе выдаём имя + 1 от существующего максимального в директории
+                # Create list with sequential values 01, 02, etc. / Создание листа с последовательными значениями 01, 02 и т.д.
                 name_logs_list = []
                 for i in logs_list:
                     name_logs_list.append(i[11:13])
 
-                # Если последовательное значение меньше 10, к числу добавляем 0, например 02.
+                # If sequential value is less than 10, add 0 to number, e.g. 02 / Если последовательное значение меньше 10, к числу добавляем 0, например 02
                 if int(max(name_logs_list)) + 1 < 10:
                     save_file_name = Path(
                         f"{self._appcfg.save_lg_dir}/{self._DATE}-0{int(max(name_logs_list)) + 1}.json"
                     )
-                else:  # Иначе просто убираем ноль.
+                else:
+                    # Otherwise just remove zero / Иначе просто убираем ноль
                     save_file_name = Path(
                         f"{self._appcfg.save_lg_dir}/{self._DATE}-{int(max(name_logs_list)) + 1}.json"
                     )
@@ -69,14 +84,18 @@ class Logger:
             self._internal_error_occurred = True
             self.critical(f"Logger internal error: {e}. In DEF _name_of_logs().")
 
-    # Универсальный шаблон, чтобы не повторять код.
+    # ===== UNIVERSAL LOGGING / УНИВЕРСАЛЬНОЕ ЛОГИРОВАНИЕ =====
     def _univ_log(self, message: str, tag: str):
+        """Universal template to avoid code repetition / Универсальный шаблон, чтобы не повторять код"""
+        # Определения времени выполнения вплоть до миллисекунд / Run-time definitions down to milliseconds
         current_time = datetime.datetime.now().strftime('%H:%M:%S.%f')
-        # Защита от внутренних ошибок класса.
-        # + Защита от рекурсии.
+        
+        # Protection from internal class errors / Защита от внутренних ошибок класса
+        # + Protection from recursion / + Защита от рекурсии
         if self._internal_error_occurred:
             print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
             return
+            
         try:
             print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
 
@@ -88,30 +107,36 @@ class Logger:
             self._internal_error_occurred = True
             self.critical(f"Logger internal error: {e}. In DEF _univ_log().")
 
-    # Уровни логов.
+    # ===== LOG LEVELS / УРОВНИ ЛОГОВ =====
     def debug(self, message="TEST, INPUT VALUE!!!", tag="DEBUG"):
+        """Debug level logging / Логирование уровня отладки"""
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["DEBUG"]:
             self._univ_log(message=message, tag=tag)
 
     def info(self, message="TEST, INPUT VALUE!!!", tag="INFO"):
+        """Info level logging / Логирование информационного уровня"""
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["INFO"]:
             self._univ_log(message=message, tag=tag)
 
     def warning(self, message="TEST, INPUT VALUE!!!", tag="WARN"):
+        """Warning level logging / Логирование уровня предупреждений"""
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["WARNING"]:
             self._univ_log(message=message, tag=tag)
 
     def error(self, message="TEST, INPUT VALUE!!!", tag="ERROR"):
+        """Error level logging / Логирование уровня ошибок"""
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["ERROR"]:
             self._univ_log(message=message, tag=tag)
 
     def critical(self, message="TEST, INPUT VALUE!!!", tag="CRIT"):
+        """Critical level logging / Логирование критического уровня"""
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["CRITICAL"]:
             self._univ_log(message=message, tag=tag)
 
 
-# Проверка работоспособности.
+# ===== FUNCTIONALITY TESTING / ПРОВЕРКА РАБОТОСПОСОБНОСТИ =====
 if __name__ == '__main__':
+    # Create logger instance and test all levels / Создание экземпляра логгера и тестирование всех уровней
     lg = Logger()
 
     lg.debug()
