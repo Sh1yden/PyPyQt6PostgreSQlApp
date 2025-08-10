@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
         # Настройка кнопок.
         # Меню Учителя.
         main_menu.add.triggered.connect(self.teacher_view.add)
-        main_menu.update.triggered.connect(self.teacher_view.update)
+        main_menu.update.triggered.connect(self.teacher_view.uppdate)
         main_menu.delete.triggered.connect(self.teacher_view.delete)
         # Меню помощи.
         main_menu.about.triggered.connect(self.about)
