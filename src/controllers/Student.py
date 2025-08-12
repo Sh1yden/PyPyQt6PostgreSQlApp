@@ -3,30 +3,30 @@ from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem, QShortcut, QKeySequence
 from PyQt6.QtWidgets import QTableView, QMessageBox, QDialog, QLabel, QHBoxLayout, QHeaderView
 from PyQt6.QtWidgets import QLineEdit, QTextEdit, QPushButton, QVBoxLayout
-import psycopg2
 import re
+import psycopg2
 from src.core.Logger import Logger
 from src.database.Connection import Connection
 
 
 # SQL Queries / SQL запросы
 INSERT = """
-    INSERT INTO "Teacher" ( f_fio, f_phone, f_email, f_comment )
-        values ( %s, %s, %s, %s ) ;
+    INSERT INTO "Student" ( f_fio, f_email, f_comment )
+        values ( %s, %s, %s ) ;
 """
 
 SELECT_ALL = """
-    SELECT * FROM "Teacher" ORDER by id
+    SELECT * FROM "Student" ORDER by id
 """
 
 UPDATE = """
-    UPDATE "Teacher" 
-    SET f_fio = %s, f_phone = %s, f_email = %s, f_comment = %s
+    UPDATE "Student" 
+    SET f_fio = %s, f_email = %s, f_comment = %s
     WHERE id = %s ;
 """
 
 DELETE = """
-    DELETE FROM "Teacher" 
+    DELETE FROM "Student" 
     WHERE id = %s ;
 """
 
@@ -34,10 +34,10 @@ DELETE = """
 # ===== MODEL CLASS / КЛАСС МОДЕЛИ =====
 class Model(QStandardItemModel):
     """
-    Model class for Teacher data / Класс модели для данных учителей
+    Model class for Student data / Класс модели для данных учеников
     Handles database operations and data validation / Обрабатывает операции с БД и валидацию данных
     """
-    
+
     # Signals / Сигналы
     data_changed = pyqtSignal()  # Add signal / Добавьте сигнал
 
@@ -47,8 +47,8 @@ class Model(QStandardItemModel):
 
         # Logger initialization / Инициализация логера
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class Teacher Model.")
-        self.lg.debug("Logger created in class Teacher Model().")
+        self.lg.debug("Constructor launched in class Student Model.")
+        self.lg.debug("Logger created in class Student Model().")
 
         # Column names storage / Хранение названий колонок
         self.column_names = []
@@ -85,24 +85,24 @@ class Model(QStandardItemModel):
                         item = QStandardItem(str(cell_value) if cell_value is not None else "")
                         self.setItem(row_idx, col_idx, item)
 
-                self.lg.debug("Teacher Model refresh data successfully. In DEF refresh_data().")
+                self.lg.debug("Student Model refresh data successfully. In DEF refresh_data().")
         except psycopg2.Error as e:
-            self.lg.error(f"Teacher Model internal error: {e}. In DEF refresh_data().")
+            self.lg.error(f"Student Model internal error: {e}. In DEF refresh_data().")
         except Exception as e:
-            self.lg.critical(f"Teacher Model internal error: {e}. In DEF refresh_data().")
+            self.lg.critical(f"Student Model internal error: {e}. In DEF refresh_data().")
 
-    def add(self, fio, phone, email, comment):
+    def add(self, fio, email, comment):
         """Add new record to database / Добавление новой записи в БД"""
         # ! May throw error if no data entered! / ! Может выдавать ошибку если не ввести данные!!!
         try:
             self.condb.connect_to_db()
-            self.condb.execute_query(INSERT, (fio, phone, email, comment))
+            self.condb.execute_query(INSERT, (fio, email, comment))
             self.refresh_data()
             self.condb.close_connection()
 
-            self.lg.debug("Teacher Model add data successfully. In DEF add().")
+            self.lg.debug("Student Model add data successfully. In DEF add().")
         except Exception as e:
-            self.lg.critical(f"Teacher Model internal error: {e}. In DEF add().")
+            self.lg.critical(f"Student Model internal error: {e}. In DEF add().")
 
     def delete_record(self, record_id):
         """Delete record from database / Удаление записи из БД"""
@@ -112,10 +112,10 @@ class Model(QStandardItemModel):
             self.refresh_data()
             self.condb.close_connection()
 
-            self.lg.debug("Teacher Model delete data successfully. In DEF add().")
+            self.lg.debug("Student Model delete data successfully. In DEF add().")
             return True
         except Exception as e:
-            self.lg.critical(f"Teacher Model internal error: {e}. In DEF add().")
+            self.lg.critical(f"Student Model internal error: {e}. In DEF add().")
 
     # ===== EDITING OPERATIONS / ОПЕРАЦИИ РЕДАКТИРОВАНИЯ =====
     def flags(self, index):
@@ -131,7 +131,7 @@ class Model(QStandardItemModel):
             # Other columns can be edited / Остальные колонки можно редактировать
             return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
         except Exception as e:
-            self.lg.error(f"Teacher Model internal error: {e}. In DEF flags().")
+            self.lg.error(f"Student Model internal error: {e}. In DEF flags().")
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         """Handle cell data changes / Обработка изменения данных в ячейке"""
@@ -152,7 +152,7 @@ class Model(QStandardItemModel):
         # Get record ID (assuming ID is in first column) / Получаем ID записи (предполагаем что ID в первой колонке)
         id_item = self.item(index.row(), 0)
         if not id_item:
-            self.lg.error("Teacher Model internal error: no id item. In DEF setData().")
+            self.lg.error("Student Model internal error: no id item. In DEF setData().")
             return False
 
         record_id = id_item.text()
@@ -167,7 +167,7 @@ class Model(QStandardItemModel):
                 row_data.append(item.text() if item else "")
 
         # Update in database / Обновляем в базе данных
-        self.lg.debug("Teacher Model try to update db. In DEF setData().")
+        self.lg.debug("Student Model try to update db. In DEF setData().")
         try:
             self.condb.connect_to_db()
             self.condb.execute_query(UPDATE, (*row_data, record_id))
@@ -178,11 +178,11 @@ class Model(QStandardItemModel):
             if result:
                 self.data_changed.emit()
                 self.lg.debug(
-                    f"Teacher Model successfully updated {column_name} for record {record_id}. In DEF setData()."
+                    f"Student Model successfully updated {column_name} for record {record_id}. In DEF setData()."
                 )
             return result
         except Exception as e:
-            self.lg.error(f"Teacher Model internal error: {e}. In DEF setData().")
+            self.lg.error(f"Student Model internal error: {e}. In DEF setData().")
             QMessageBox.warning(None, "Update error",
                               f"Failed to update record: {str(e)}")
             return False
@@ -192,23 +192,16 @@ class Model(QStandardItemModel):
         """Data validation depending on column type / Валидация данных в зависимости от типа колонки"""
         if column_name == 'f_fio':
             if not value or len(value.strip()) < 2:
-                self.lg.error(f"Teacher Model internal error: Validation error in FIO. In DEF _validate_data().")
+                self.lg.error(f"Student Model internal error: Validation error in FIO. In DEF _validate_data().")
                 QMessageBox.warning(None, "Validation error",
-                                      "The full name must contain at least 2 characters.")
-                return False
-
-        elif column_name == 'f_phone':
-            if value and not re.match(r'^[\d\s\+\-\(\)]+$', value):
-                self.lg.error(f"Teacher Model internal error: Validation error in PHONE. In DEF _validate_data().")
-                QMessageBox.warning(None, "Validation error",
-                                      "Incorrect phone number format")
+                                  "The full name must contain at least 2 characters.")
                 return False
 
         elif column_name == 'f_email':
             if value and not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value):
-                self.lg.error(f"Teacher Model internal error: Validation error in EMAIL. In DEF _validate_data().")
+                self.lg.error(f"Student Model internal error: Validation error in EMAIL. In DEF _validate_data().")
                 QMessageBox.warning(None, "Validation error",
-                                      "Invalid email address format")
+                                  "Invalid email address format")
                 return False
         return True
 
@@ -216,7 +209,7 @@ class Model(QStandardItemModel):
 # ===== VIEW CLASS / КЛАСС ПРЕДСТАВЛЕНИЯ =====
 class View(QTableView):
     """
-    View class for displaying Teacher data / Класс представления для отображения данных учителей
+    View class for displaying Student data / Класс представления для отображения данных учеников
     Handles user interface and interactions / Обрабатывает пользовательский интерфейс и взаимодействия
     """
 
@@ -226,18 +219,18 @@ class View(QTableView):
 
         # Logger initialization / Инициализация логера
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class Teacher View.")
-        self.lg.debug("Logger created in class Teacher View().")
+        self.lg.debug("Constructor launched in class Student View.")
+        self.lg.debug("Logger created in class Student View().")
 
         # Model setup / Настройка модели
-        self.teacher_model = Model(parent=self)
-        self.setModel(self.teacher_model)
+        self.student_model = Model(parent=self)
+        self.setModel(self.student_model)
 
         # Table view setup / Настройка представления таблицы
         self.setup_table_view()
-        
+
         # Signal connections / Подключение сигналов
-        self.teacher_model.data_changed.connect(self.on_data_changed)
+        self.student_model.data_changed.connect(self.on_data_changed)
 
         # Keyboard shortcuts / Горячие клавиши
         # Delete key for deletion / Delete key для удаления
@@ -254,7 +247,7 @@ class View(QTableView):
         # Stretch columns to content / Растягиваем колонки по содержимому
         self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         # And the last column to the end of the screen / И последнюю колонку до конца экрана
-        self.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
 
         # Allow row selection / Разрешаем выделение строк
         self.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
@@ -272,24 +265,23 @@ class View(QTableView):
         self.setAlternatingRowColors(True)  # Alternating row colors / Чередующиеся цвета строк
         self.setWordWrap(False)  # Disable word wrap / Отключаем перенос слов
 
-        self.lg.debug("Teacher View setup table successfully. In DEF setup_table_view().")
+        self.lg.debug("Student View setup table successfully. In DEF setup_table_view().")
 
     # ===== SLOT METHODS / МЕТОДЫ-СЛОТЫ =====
     @pyqtSlot()
     def on_data_changed(self):
         """Handle model data changes / Обработка изменения данных в модели"""
-        self.lg.debug("Teacher View data changed in model, refreshing view. In DEF on_data_changed()")
+        self.lg.debug("Student View data changed in model, refreshing view. In DEF on_data_changed()")
         self.resizeColumnsToContents()
 
     # ===== CRUD OPERATIONS / ОПЕРАЦИИ CRUD =====
     def add(self):
         """Add new cell to model / Добавление новой ячейки в модель"""
         # Stub / Заглушка
-        # QMessageBox.information(self, "Teacher", "Add")
+        # QMessageBox.information(self, "Student", "Add")
         dia = Dialog(parent=self)
         if dia.exec():
             self.model().add(dia.fio,
-                             dia.phone,
                              dia.email,
                              dia.comment)
 
@@ -344,13 +336,13 @@ class View(QTableView):
                 if self.model().delete_record(record_id):
                     QMessageBox.information(self, "Deletion",
                                           f"Record '{fio}' successfully deleted")
-                    self.lg.debug(f"Teacher View: Successfully deleted record {record_id}")
+                    self.lg.debug(f"Student View: Successfully deleted record {record_id}")
                 else:
                     QMessageBox.critical(self, "Error",
                                        "The record could not be deleted.\n"
                                        "Check the log for details.")
         except Exception as e:
-            self.lg.error(f"Teacher View internal error: {e}. In DEF delete().")
+            self.lg.error(f"Student View internal error: {e}. In DEF delete().")
 
     def delete_selected(self):
         try:
@@ -399,14 +391,14 @@ class View(QTableView):
                 else:
                     QMessageBox.information(self, "Deletion result", message)
         except Exception as e:
-            self.lg.error(f"Teacher View internal error: {e}. In DEF delete_selected().")
+            self.lg.error(f"Student View internal error: {e}. In DEF delete_selected().")
 
 
 # ===== DIALOG CLASS / КЛАСС ДИАЛОГА =====
 class Dialog(QDialog):
     """
-    Dialog class for adding new teacher records / Класс диалога для добавления новых записей учителей
-    Provides input form for teacher data / Предоставляет форму ввода для данных учителя
+    Dialog class for adding new student records / Класс диалога для добавления новых записей учеников
+    Provides input form for student data / Предоставляет форму ввода для данных ученика
     """
 
     # ===== INITIALIZATION / ИНИЦИАЛИЗАЦИЯ =====
@@ -415,16 +407,14 @@ class Dialog(QDialog):
 
         # Logger initialization / Инициализация логера
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class Teacher Dialog.")
-        self.lg.debug("Logger created in class Teacher Dialog().")
+        self.lg.debug("Constructor launched in class Student Dialog.")
+        self.lg.debug("Logger created in class Student Dialog().")
 
-        self.setWindowTitle("Teacher")
+        self.setWindowTitle("Student")
 
         # Form labels and inputs / Метки и поля формы
         fio_lbl = QLabel("Surname N. P.", parent=self)
         self.__fio_edit = QLineEdit(parent=self)
-        phone_lbl = QLabel("Phone number", parent=self)
-        self.__phone_edit = QLineEdit(parent=self)
         email_lbl = QLabel("Email", parent=self)
         self.__email_edit = QLineEdit(parent=self)
         comment_lbl = QLabel("Comment", parent=self)
@@ -438,8 +428,6 @@ class Dialog(QDialog):
         lay = QVBoxLayout(self)
         lay.addWidget(fio_lbl)
         lay.addWidget(self.__fio_edit)
-        lay.addWidget(phone_lbl)
-        lay.addWidget(self.__phone_edit)
         lay.addWidget(email_lbl)
         lay.addWidget(self.__email_edit)
         lay.addWidget(comment_lbl)
@@ -460,13 +448,13 @@ class Dialog(QDialog):
     def finish(self):
         """Dialog completion handler / Обработчик завершения диалога"""
         if self.fio is None:
-            self.lg.debug("Teacher Dialog not fio input. In DEF finish().")
+            self.lg.debug("Student Dialog not fio input. In DEF finish().")
             QMessageBox.information(self,
                                     "Please input Surname N.P!!!",
                                     "Please input Surname N.P!!! This is necessarily.")
             return
         self.accept()
-        self.lg.debug("Teacher Dialog self.accept(). In DEF finish().")
+        self.lg.debug("Student Dialog self.accept(). In DEF finish().")
 
     # ===== PROPERTY METHODS / МЕТОДЫ-СВОЙСТВА =====
     @property
@@ -476,18 +464,7 @@ class Dialog(QDialog):
         if result == "":
             return None
         else:
-            self.lg.debug("Teacher Dialog fio successfully. In DEF fio().")
-            return result
-
-    @property
-    def phone(self):
-        """Get phone input value / Получение значения ввода телефона"""
-        result = self.__phone_edit.text().strip()
-        if result == "":
-            self.lg.debug("Teacher Dialog not phone input. In DEF phone().")
-            return None
-        else:
-            self.lg.debug("Teacher Dialog phone successfully. In DEF phone().")
+            self.lg.debug("Student Dialog fio successfully. In DEF fio().")
             return result
 
     @property
@@ -495,10 +472,10 @@ class Dialog(QDialog):
         """Get email input value / Получение значения ввода email"""
         result = self.__email_edit.text().strip()
         if result == "":
-            self.lg.debug("Teacher Dialog not email input. In DEF email().")
+            self.lg.debug("Student Dialog not email input. In DEF email().")
             return None
         else:
-            self.lg.debug("Teacher Dialog email successfully. In DEF email().")
+            self.lg.debug("Student Dialog email successfully. In DEF email().")
             return result
 
     @property
@@ -506,8 +483,8 @@ class Dialog(QDialog):
         """Get comment input value / Получение значения ввода комментария"""
         result = self.__comment_edit.toPlainText().strip()
         if result == "":
-            self.lg.debug("Teacher Dialog not comment input. In DEF comment().")
+            self.lg.debug("Student Dialog not comment input. In DEF comment().")
             return None
         else:
-            self.lg.debug("Teacher Dialog comment successfully. In DEF comment().")
+            self.lg.debug("Student Dialog comment successfully. In DEF comment().")
             return result

@@ -1,10 +1,16 @@
 # ===== MAIN WINDOW CLASS / КЛАСС ГЛАВНОГО ОКНА =====
 
 # ===== IMPORTS / ИМПОРТЫ =====
-from PyQt6.QtWidgets import QMainWindow, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QStyle
 from PyQt6.QtCore import pyqtSlot  # Slot function responds to program actions / Slot функция реагирует на действие в программе
+from PyQt6.QtGui import QIcon
+
+# ! Смена класса отображения
+from src.controllers.Teacher import View # Teacher
+# from src.controllers.Student import View # Student
+# from src.controllers.StGroup import View # Group
+
 from src.ui.MainMenu import MainMenu
-from src.controllers.Teacher import View
 from src.core.Logger import Logger
 
 
@@ -32,7 +38,14 @@ class MainWindow(QMainWindow):
         self.lg.debug("Logger created in class MainMenu().")
 
         # ===== WINDOW CONFIGURATION / КОНФИГУРАЦИЯ ОКНА =====
+        # Window title / Имя окна
         self.setWindowTitle("Managing student assignments")
+        # Window icon / Иконка окна
+        # TODO добавить свою иконку
+        self._icon: QIncon = QIcon()
+        if self._icon.isNull():
+            self._icon: QIncon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+        self.setWindowIcon(self._icon)
 
         # ===== MAIN MENU SETUP / НАСТРОЙКА ГЛАВНОГО МЕНЮ =====
         # Parent=self sets parent window for main menu / Parent=self установка родительского окна для главного меню
@@ -41,14 +54,33 @@ class MainWindow(QMainWindow):
 
         # ===== CENTRAL WIDGET SETUP / НАСТРОЙКА ЦЕНТРАЛЬНОГО ВИДЖЕТА =====
         # Create and set Teacher.View as central widget / Создание и установка Teacher.View как центрального виджета
+        # Teacher
         self.teacher_view = View()
         self.setCentralWidget(self.teacher_view)
 
+        # Student
+        # self.student_view = View()
+        # self.setCentralWidget(self.student_view)
+
+        # Group
+        # self.st_group_view = View()
+        # self.setCentralWidget(self.st_group_view)
+
         # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
         # Teacher menu connections / Меню Учителя
-        main_menu.add.triggered.connect(self.teacher_view.add)
-        main_menu.update.triggered.connect(self.teacher_view.uppdate)
-        main_menu.delete.triggered.connect(self.teacher_view.delete)
+        main_menu.teacher_add.triggered.connect(self.teacher_view.add)
+        main_menu.teacher_update.triggered.connect(self.teacher_view.uppdate)
+        main_menu.teacher_delete.triggered.connect(self.teacher_view.delete)
+
+        # Student menu connections / Меню Ученика
+        # main_menu.student_add.triggered.connect(self.student_view.add)
+        # main_menu.student_update.triggered.connect(self.student_view.uppdate)
+        # main_menu.student_delete.triggered.connect(self.student_view.delete)
+
+        # Group menu connections / Меню Группы
+        # main_menu.st_group_add.triggered.connect(self.st_group_view.add)
+        # main_menu.st_group_update.triggered.connect(self.st_group_view.uppdate)
+        # main_menu.st_group_delete.triggered.connect(self.st_group_view.delete)
 
         # Help menu connections / Меню помощи
         main_menu.about.triggered.connect(self.about)
@@ -59,11 +91,15 @@ class MainWindow(QMainWindow):
     # Декоратор, чтобы показать что это именно слот, а не просто функция
     @pyqtSlot()
     def about(self):
-        title = "Managing student assignments"
-        text = ("Program for managing assignments\n" +
-                "and tasks for students school")
-        QMessageBox.about(self, title, text)
+        """Show information about the program / Показать информацию о программе"""
+        QMessageBox.about(self, "About program",
+                         "School management application\n"
+                         "Version 1.0\n"
+                         "Built with PyQt6 and PostgreSQL")
+        self.lg.debug("MainWindow about program dialog shown. In DEF about().")
 
     @pyqtSlot()
     def about_qt(self):
-        QMessageBox.aboutQt(self, "Managing student assignments")
+        """Show information about Qt / Показать информацию о Qt"""
+        QMessageBox.aboutQt(self, "About Qt")
+        self.lg.debug("MainWindow about Qt dialog shown. In DEF about_qt().")
