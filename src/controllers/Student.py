@@ -1,56 +1,118 @@
-# Imports / Импорты
+# ===== STUDENT CONTROLLER MODULE / МОДУЛЬ КОНТРОЛЛЕРА СТУДЕНТА =====
+# Student entity MVC implementation / Реализация MVC для сущности Студент
+
+# ===== IMPORTS / ИМПОРТЫ =====
+# Base controller classes for MVC pattern / Базовые классы контроллеров для паттерна MVC
 from src.controllers.base_controller.BaseModel import BaseModel
 from src.controllers.base_controller.BaseView import BaseView
 from src.controllers.base_controller.BaseDialog import BaseDialog
+
+# Logging system / Система логирования
 from src.core.Logger import Logger
 
 
 # ===== MODEL CLASS / КЛАСС МОДЕЛИ =====
 class Model(BaseModel):
     """
-    Model class for data / Класс модели для данных
-    Handles database operations and data validation / Обрабатывает операции с БД и валидацию данных
+    Student model class for data management / Класс модели студента для управления данными
+
+    Handles database operations and data validation for students:
+    Обрабатывает операции с БД и валидацию данных для студентов:
+    - CRUD operations with student table / CRUD операции с таблицей студентов
+    - Data validation and business logic / Валидация данных и бизнес-логика
+    - Database connection management / Управление соединениями с базой данных
     """
 
     # ===== INITIALIZATION / ИНИЦИАЛИЗАЦИЯ =====
     def __init__(self, parent=None):
-        # Инициализация базовой модели
-        super().__init__("Student",
-                         ['f_fio', 'f_email', 'f_comment'],
-                         parent)
+        """
+        Initialize student model with database configuration / Инициализация модели студента с конфигурацией БД
+
+        Args:
+            parent: Parent object for Qt hierarchy / Родительский объект для иерархии Qt
+        """
+        # Initialize base model with student-specific configuration /
+        # Инициализация базовой модели с конфигурацией, специфичной для студента
+        super().__init__(
+            table_name="Student",
+            columns=['f_fio', 'f_email', 'f_comment'],
+            parent=parent
+        )
 
 
 # ===== VIEW CLASS / КЛАСС ПРЕДСТАВЛЕНИЯ =====
 class View(BaseView):
     """
-    View class for displaying data / Класс представления для отображения данных
-    Handles user interface and interactions / Обрабатывает пользовательский интерфейс и взаимодействия
+    Student view class for user interface / Класс представления студента для пользовательского интерфейса
+
+    Handles user interface and interactions for student management:
+    Обрабатывает пользовательский интерфейс и взаимодействия для управления студентами:
+    - Table display and formatting / Отображение и форматирование таблицы
+    - User interaction handling / Обработка пользовательских взаимодействий
+    - CRUD operation coordination / Координация CRUD операций
     """
 
     # ===== INITIALIZATION / ИНИЦИАЛИЗАЦИЯ =====
     def __init__(self, parent=None):
-        super().__init__(Model,
-                         3,
-                         parent)
+        """
+        Initialize student view with model configuration / Инициализация представления студента с конфигурацией модели
 
+        Args:
+            parent: Parent widget for Qt hierarchy / Родительский виджет для иерархии Qt
+        """
+        # Initialize base view with student model and comment column stretch /
+        # Инициализация базового представления с моделью студента и растяжением колонки комментариев
+        super().__init__(
+            model_class=Model,
+            index_last_stretch_colum=3,  # Comment column index for stretching / Индекс колонки комментариев для растяжения
+            parent=parent
+        )
+
+    # ===== CRUD OPERATIONS / ОПЕРАЦИИ CRUD =====
     def add(self):
-        """Add new cell to model / Добавление новой ячейки в модель"""
-        dia = Dialog(parent=self)
-        if dia.exec():
-            self.model().add(dia.fio,
-                             dia.email,
-                             dia.comment)
+        """
+        Add new student record through dialog / Добавление новой записи студента через диалог
+
+        Opens student input dialog and processes the data if confirmed.
+        Открывает диалог ввода студента и обрабатывает данные при подтверждении.
+        """
+        # Create and show student input dialog / Создание и отображение диалога ввода студента
+        dialog = Dialog(parent=self)
+
+        # Process dialog result if user confirms / Обработка результата диалога при подтверждении пользователя
+        if dialog.exec():
+            # Add new student with dialog data / Добавление нового студента с данными из диалога
+            self.model().add(
+                dialog.fio,      # Full name / Полное имя
+                dialog.email,    # Email address / Email адрес
+                dialog.comment   # Additional comments / Дополнительные комментарии
+            )
 
 
 # ===== DIALOG CLASS / КЛАСС ДИАЛОГА =====
 class Dialog(BaseDialog):
     """
-    Dialog class for adding new records / Класс диалога для добавления новых записей
-    Provides input form for data / Предоставляет форму ввода для данных
+    Student input dialog class / Класс диалога ввода студента
+
+    Provides input form for student data entry:
+    Предоставляет форму ввода для ввода данных студента:
+    - Form validation and data collection / Валидация формы и сбор данных
+    - User-friendly input interface / Дружественный интерфейс ввода
+    - Data preparation for model operations / Подготовка данных для операций модели
     """
 
     # ===== INITIALIZATION / ИНИЦИАЛИЗАЦИЯ =====
     def __init__(self, parent=None):
-        super().__init__("Student",
-                            ["fio", "email", "comment"],
-                                       parent)
+        """
+        Initialize student input dialog / Инициализация диалога ввода студента
+
+        Args:
+            parent: Parent widget for modal dialog / Родительский виджет для модального диалога
+        """
+        # Initialize base dialog with student-specific fields /
+        # Инициализация базового диалога с полями, специфичными для студента
+        super().__init__(
+            window_title="Student",
+            fields=["fio", "email", "comment"],  # Required input fields / Обязательные поля ввода
+            parent=parent
+        )

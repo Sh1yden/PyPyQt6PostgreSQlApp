@@ -1,15 +1,19 @@
-# ===== MAIN WINDOW CLASS / КЛАСС ГЛАВНОГО ОКНА =====
+# ===== MAIN WINDOW CLASS FOR APPLICATION UI / КЛАСС ГЛАВНОГО ОКНА ДЛЯ UI ПРИЛОЖЕНИЯ =====
+# Primary application window managing user interface and component coordination
+# Основное окно приложения, управляющее пользовательским интерфейсом и координацией компонентов
 
 # ===== IMPORTS / ИМПОРТЫ =====
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QStyle
 from PyQt6.QtCore import pyqtSlot  # Slot function responds to program actions / Slot функция реагирует на действие в программе
 from PyQt6.QtGui import QIcon
 
-# ! Смена класса отображения
-from src.controllers.Teacher import View # Teacher
-# from src.controllers.Student import View # Student
-# from src.controllers.StGroup import View # Group
+# ===== VIEW IMPORTS - ENTITY CONTROLLERS / ИМПОРТЫ ПРЕДСТАВЛЕНИЙ - КОНТРОЛЛЕРЫ СУЩНОСТЕЙ =====
+# ! Change display class here / ! Смена класса отображения здесь
+from src.controllers.Teacher import View  # Teacher view / Представление учителя
+# from src.controllers.Student import View  # Student view / Представление ученика
+# from src.controllers.StGroup import View  # Group view / Представление группы
 
+# ===== UI COMPONENT IMPORTS / ИМПОРТЫ КОМПОНЕНТОВ UI =====
 from src.ui.MainMenu import MainMenu
 from src.core.Logger import Logger
 
@@ -19,87 +23,260 @@ class MainWindow(QMainWindow):
     """
     Main application window class / Класс главного окна приложения
     Manages the primary user interface and coordinates application components / Управляет основным пользовательским интерфейсом и координирует компоненты приложения
+
+    This class serves as the main container for the application's user interface.
+    It manages the menu system, central widget display, window properties, and user interactions.
+    Acts as the coordinator between different UI components and business logic.
+
+    Этот класс служит основным контейнером для пользовательского интерфейса приложения.
+    Он управляет системой меню, отображением центрального виджета, свойствами окна и взаимодействиями пользователя.
+    Действует как координатор между различными компонентами UI и бизнес-логикой.
     """
 
-    # ===== INITIALIZATION / ИНИЦИАЛИЗАЦИЯ =====
+    # ===== INITIALIZATION METHOD / МЕТОД ИНИЦИАЛИЗАЦИИ =====
     def __init__(self, parent=None):
         """
-        Class constructor / Конструктор класса
+        Class constructor and main window setup / Конструктор класса и настройка главного окна
+
+        Initializes the main window with all necessary components including menu system,
+        central widget, window properties, and signal connections.
+        Sets up logging and configures the primary user interface.
+
+        Инициализирует главное окно со всеми необходимыми компонентами, включая систему меню,
+        центральный виджет, свойства окна и подключения сигналов.
+        Настраивает логирование и конфигурирует основной пользовательский интерфейс.
 
         Args:
-            parent: Parent widget / Родительский виджет
+            parent: Parent widget (typically None for main window) / Родительский виджет (обычно None для главного окна)
         """
-        # Main window setup / Настройка главного окна
+        # ===== PARENT CLASS INITIALIZATION / ИНИЦИАЛИЗАЦИЯ РОДИТЕЛЬСКОГО КЛАССА =====
         super().__init__(parent)
 
-        # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГГЕРА =====
+        # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГЕРА =====
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class MainMenu.")
-        self.lg.debug("Logger created in class MainMenu().")
+        self.lg.debug("Constructor launched in class MainWindow.")
+        self.lg.debug("Logger created in class MainWindow().")
 
         # ===== WINDOW CONFIGURATION / КОНФИГУРАЦИЯ ОКНА =====
-        # Window title / Имя окна
-        self.setWindowTitle("Managing student assignments")
-        # Window icon / Иконка окна
-        # TODO добавить свою иконку
-        self._icon: QIncon = QIcon()
-        if self._icon.isNull():
-            self._icon: QIncon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
-        self.setWindowIcon(self._icon)
+        self._setup_window_properties()
 
-        # ===== MAIN MENU SETUP / НАСТРОЙКА ГЛАВНОГО МЕНЮ =====
-        # Parent=self sets parent window for main menu / Parent=self установка родительского окна для главного меню
-        main_menu = MainMenu(parent=self)
-        self.setMenuBar(main_menu)  # Set main menu for window / установка главного меню для окна
+        # ===== MENU SYSTEM SETUP / НАСТРОЙКА СИСТЕМЫ МЕНЮ =====
+        self._setup_menu_system()
 
         # ===== CENTRAL WIDGET SETUP / НАСТРОЙКА ЦЕНТРАЛЬНОГО ВИДЖЕТА =====
+        self._setup_central_widget()
+
+        # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
+        self._connect_menu_signals()
+
+        self.lg.debug("MainWindow initialization completed successfully.")
+
+    # ===== PRIVATE METHODS - INITIALIZATION HELPERS / ПРИВАТНЫЕ МЕТОДЫ - ПОМОЩНИКИ ИНИЦИАЛИЗАЦИИ =====
+
+    def _setup_window_properties(self):
+        """
+        Configure main window properties / Настройка свойств главного окна
+
+        Sets up window title, icon, and other display properties.
+        Configures the basic appearance and behavior of the main window.
+
+        Настраивает заголовок окна, иконку и другие свойства отображения.
+        Конфигурирует основной внешний вид и поведение главного окна.
+        """
+        # ===== WINDOW TITLE / ЗАГОЛОВОК ОКНА =====
+        self.setWindowTitle("Managing student assignments")
+
+        # ===== WINDOW ICON SETUP / НАСТРОЙКА ИКОНКИ ОКНА =====
+        # TODO: Add custom icon / TODO добавить свою иконку
+        self._icon = QIcon()
+        if self._icon.isNull():
+            # Use system default computer icon if custom icon not available / Использовать системную иконку компьютера, если пользовательская недоступна
+            self._icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+        self.setWindowIcon(self._icon)
+
+        self.lg.debug("MainWindow window properties configured successfully.")
+
+    def _setup_menu_system(self):
+        """
+        Initialize and configure the main menu system / Инициализация и настройка системы главного меню
+
+        Creates the main menu bar with all necessary menu items.
+        Sets up the hierarchical menu structure for the application.
+
+        Создает главную строку меню со всеми необходимыми элементами меню.
+        Настраивает иерархическую структуру меню для приложения.
+        """
+        # ===== MAIN MENU CREATION / СОЗДАНИЕ ГЛАВНОГО МЕНЮ =====
+        # Parent=self sets parent window for main menu / Parent=self установка родительского окна для главного меню
+        self.main_menu = MainMenu(parent=self)
+        self.setMenuBar(self.main_menu)  # Set main menu for window / установка главного меню для окна
+
+        self.lg.debug("MainWindow menu system configured successfully.")
+
+    def _setup_central_widget(self):
+        """
+        Configure the central widget display / Настройка отображения центрального виджета
+
+        Sets up the main content area of the window with the appropriate view.
+        Currently configured to display Teacher view, but can be switched to other entities.
+
+        Настраивает основную область содержимого окна с соответствующим представлением.
+        В настоящее время настроен для отображения представления Teacher, но может быть переключен на другие сущности.
+        """
+        # ===== ENTITY VIEW SELECTION / ВЫБОР ПРЕДСТАВЛЕНИЯ СУЩНОСТИ =====
         # Create and set Teacher.View as central widget / Создание и установка Teacher.View как центрального виджета
-        # Teacher
+
+        # ===== TEACHER VIEW (CURRENTLY ACTIVE) / ПРЕДСТАВЛЕНИЕ УЧИТЕЛЯ (АКТИВНО В ДАННЫЙ МОМЕНТ) =====
         self.teacher_view = View()
         self.setCentralWidget(self.teacher_view)
 
-        # Student
+        # ===== STUDENT VIEW (COMMENTED OUT) / ПРЕДСТАВЛЕНИЕ УЧЕНИКА (ЗАКОММЕНТИРОВАНО) =====
+        # Uncomment to switch to Student view / Раскомментировать для переключения на представление Student
         # self.student_view = View()
         # self.setCentralWidget(self.student_view)
 
-        # Group
+        # ===== GROUP VIEW (COMMENTED OUT) / ПРЕДСТАВЛЕНИЕ ГРУППЫ (ЗАКОММЕНТИРОВАНО) =====
+        # Uncomment to switch to Group view / Раскомментировать для переключения на представление Group
         # self.st_group_view = View()
         # self.setCentralWidget(self.st_group_view)
 
-        # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
-        # Teacher menu connections / Меню Учителя
-        main_menu.teacher_add.triggered.connect(self.teacher_view.add)
-        main_menu.teacher_update.triggered.connect(self.teacher_view.uppdate)
-        main_menu.teacher_delete.triggered.connect(self.teacher_view.delete)
+        self.lg.debug("MainWindow central widget configured successfully.")
 
-        # Student menu connections / Меню Ученика
-        # main_menu.student_add.triggered.connect(self.student_view.add)
-        # main_menu.student_update.triggered.connect(self.student_view.uppdate)
-        # main_menu.student_delete.triggered.connect(self.student_view.delete)
+    def _connect_menu_signals(self):
+        """
+        Connect menu actions to their respective handlers / Подключение действий меню к соответствующим обработчикам
 
-        # Group menu connections / Меню Группы
-        # main_menu.st_group_add.triggered.connect(self.st_group_view.add)
-        # main_menu.st_group_update.triggered.connect(self.st_group_view.uppdate)
-        # main_menu.st_group_delete.triggered.connect(self.st_group_view.delete)
+        Establishes signal-slot connections between menu items and their functionality.
+        Links user interface actions to business logic operations.
 
-        # Help menu connections / Меню помощи
-        main_menu.about.triggered.connect(self.about)
-        main_menu.about_qt.triggered.connect(self.about_qt)
+        Устанавливает связи сигнал-слот между элементами меню и их функциональностью.
+        Связывает действия пользовательского интерфейса с операциями бизнес-логики.
+        """
+        # ===== TEACHER MENU CONNECTIONS / ПОДКЛЮЧЕНИЯ МЕНЮ УЧИТЕЛЯ =====
+        # Connect Teacher menu actions to Teacher view methods / Подключение действий меню Teacher к методам представления Teacher
+        self.main_menu.teacher_add.triggered.connect(self.teacher_view.add)
+        self.main_menu.teacher_update.triggered.connect(self.teacher_view.uppdate)
+        self.main_menu.teacher_delete.triggered.connect(self.teacher_view.delete)
 
-    # ===== SLOT METHODS / МЕТОДЫ-СЛОТЫ =====
-    # Decorator to show this is a slot, not just a function /
-    # Декоратор, чтобы показать что это именно слот, а не просто функция
+        # ===== STUDENT MENU CONNECTIONS (COMMENTED OUT) / ПОДКЛЮЧЕНИЯ МЕНЮ УЧЕНИКА (ЗАКОММЕНТИРОВАНО) =====
+        # Uncomment when switching to Student view / Раскомментировать при переключении на представление Student
+        # self.main_menu.student_add.triggered.connect(self.student_view.add)
+        # self.main_menu.student_update.triggered.connect(self.student_view.uppdate)
+        # self.main_menu.student_delete.triggered.connect(self.student_view.delete)
+
+        # ===== GROUP MENU CONNECTIONS (COMMENTED OUT) / ПОДКЛЮЧЕНИЯ МЕНЮ ГРУППЫ (ЗАКОММЕНТИРОВАНО) =====
+        # Uncomment when switching to Group view / Раскомментировать при переключении на представление Group
+        # self.main_menu.st_group_add.triggered.connect(self.st_group_view.add)
+        # self.main_menu.st_group_update.triggered.connect(self.st_group_view.uppdate)
+        # self.main_menu.st_group_delete.triggered.connect(self.st_group_view.delete)
+
+        # ===== HELP MENU CONNECTIONS / ПОДКЛЮЧЕНИЯ МЕНЮ ПОМОЩИ =====
+        # Connect Help menu actions to information dialogs / Подключение действий меню помощи к информационным диалогам
+        self.main_menu.about.triggered.connect(self.about)
+        self.main_menu.about_qt.triggered.connect(self.about_qt)
+
+        self.lg.debug("MainWindow menu signals connected successfully.")
+
+    # ===== SLOT METHODS - MENU ACTION HANDLERS / МЕТОДЫ-СЛОТЫ - ОБРАБОТЧИКИ ДЕЙСТВИЙ МЕНЮ =====
+
     @pyqtSlot()
     def about(self):
-        """Show information about the program / Показать информацию о программе"""
+        """
+        Show information about the program / Показать информацию о программе
+
+        Displays an "About" dialog with application information including version,
+        description, and technology stack used.
+
+        Отображает диалог "О программе" с информацией о приложении, включая версию,
+        описание и используемый технологический стек.
+        """
         QMessageBox.about(self, "About program",
                          "School management application\n"
-                         "Version 1.0\n"
-                         "Built with PyQt6 and PostgreSQL")
+                         "Приложение для управления школой\n\n"
+                         "Version / Версия: 1.0\n"
+                         "Built with PyQt6 and PostgreSQL\n"
+                         "Создано с использованием PyQt6 и PostgreSQL\n\n"
+                         "Features / Возможности:\n"
+                         "• Teacher management / Управление учителями\n"
+                         "• Student management / Управление учениками\n"  
+                         "• Group management / Управление группами\n"
+                         "• Database integration / Интеграция с базой данных")
         self.lg.debug("MainWindow about program dialog shown. In DEF about().")
 
     @pyqtSlot()
     def about_qt(self):
-        """Show information about Qt / Показать информацию о Qt"""
+        """
+        Show information about Qt framework / Показать информацию о фреймворке Qt
+
+        Displays the standard Qt "About Qt" dialog with information about
+        the Qt framework version and licensing.
+
+        Отображает стандартный диалог Qt "О Qt" с информацией о
+        версии фреймворка Qt и лицензировании.
+        """
         QMessageBox.aboutQt(self, "About Qt")
         self.lg.debug("MainWindow about Qt dialog shown. In DEF about_qt().")
+
+    # ===== PUBLIC METHODS - UTILITY FUNCTIONS / ПУБЛИЧНЫЕ МЕТОДЫ - УТИЛИТАРНЫЕ ФУНКЦИИ =====
+
+    def switch_to_teacher_view(self):
+        """
+        Switch central widget to Teacher view / Переключить центральный виджет на представление Teacher
+
+        Dynamically changes the central widget to display Teacher management interface.
+        Updates menu connections to work with the new view.
+
+        Динамически изменяет центральный виджет для отображения интерфейса управления Teacher.
+        Обновляет подключения меню для работы с новым представлением.
+        """
+        # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
+        self.lg.info("Switching to Teacher view requested.")
+
+    def switch_to_student_view(self):
+        """
+        Switch central widget to Student view / Переключить центральный виджет на представление Student
+
+        Dynamically changes the central widget to display Student management interface.
+        Updates menu connections to work with the new view.
+
+        Динамически изменяет центральный виджет для отображения интерфейса управления Student.
+        Обновляет подключения меню для работы с новым представлением.
+        """
+        # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
+        self.lg.info("Switching to Student view requested.")
+
+    def switch_to_group_view(self):
+        """
+        Switch central widget to Group view / Переключить центральный виджет на представление Group
+
+        Dynamically changes the central widget to display Group management interface.
+        Updates menu connections to work with the new view.
+
+        Динамически изменяет центральный виджет для отображения интерфейса управления Group.
+        Обновляет подключения меню для работы с новым представлением.
+        """
+        # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
+        self.lg.info("Switching to Group view requested.")
+
+
+# ===== MAIN EXECUTION BLOCK - FOR TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ДЛЯ ТЕСТИРОВАНИЯ =====
+if __name__ == '__main__':
+    # This block can be used for testing MainWindow functionality independently
+    # Этот блок может использоваться для независимого тестирования функциональности MainWindow
+    from PyQt6.QtWidgets import QApplication
+    import sys
+
+    print("=== MainWindow Testing Mode / Режим тестирования MainWindow ===")
+
+    # Create test application / Создание тестового приложения
+    app = QApplication(sys.argv)
+
+    # Create and show main window / Создание и отображение главного окна
+    window = MainWindow()
+    window.showMaximized()
+
+    print("MainWindow created and displayed successfully.")
+    print("MainWindow создано и отображено успешно.")
+
+    # Run application / Запуск приложения
+    sys.exit(app.exec())
