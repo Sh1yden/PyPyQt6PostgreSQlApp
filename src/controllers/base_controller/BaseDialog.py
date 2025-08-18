@@ -53,7 +53,7 @@ class BaseDialog(QDialog):
 
     # ===== PRIVATE METHODS - UI SETUP / ПРИВАТНЫЕ МЕТОДЫ - НАСТРОЙКА UI =====
     
-    def set_window_dialog(self, window_title: str, privilege: list):
+    def set_window_dialog(self, window_title: str, privilege: list) -> None:
         """
         Configure dialog window and create input fields / Настройка диалогового окна и создание полей ввода
         
@@ -136,7 +136,7 @@ class BaseDialog(QDialog):
     # ===== SLOT METHODS - EVENT HANDLERS / МЕТОДЫ-СЛОТЫ - ОБРАБОТЧИКИ СОБЫТИЙ =====
     
     @pyqtSlot()
-    def finish(self):
+    def finish(self) -> None:
         """
         Dialog completion handler / Обработчик завершения диалога
         
@@ -163,7 +163,7 @@ class BaseDialog(QDialog):
     # ===== PROPERTY METHODS - DATA ACCESS / МЕТОДЫ-СВОЙСТВА - ДОСТУП К ДАННЫМ =====
     
     @property
-    def fio(self):
+    def fio(self) -> str | None:
         """
         Get FIO (Full Name) input value / Получение значения ввода ФИО (Полное имя)
         
@@ -184,7 +184,7 @@ class BaseDialog(QDialog):
             return result
 
     @property
-    def phone(self):
+    def phone(self) -> str | None:
         """
         Get phone input value / Получение значения ввода телефона
         
@@ -206,7 +206,7 @@ class BaseDialog(QDialog):
             return result
 
     @property
-    def email(self):
+    def email(self) -> str | None:
         """
         Get email input value / Получение значения ввода email
         
@@ -228,7 +228,7 @@ class BaseDialog(QDialog):
             return result
 
     @property
-    def comment(self):
+    def comment(self) -> str | None:
         """
         Get comment input value / Получение значения ввода комментария
         

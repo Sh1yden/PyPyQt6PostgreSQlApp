@@ -25,7 +25,7 @@ class BaseView(QTableView):
     """
 
     # ===== INITIALIZATION METHOD / МЕТОД ИНИЦИАЛИЗАЦИИ =====
-    def __init__(self, model_class, index_last_stretch_colum: int | None = None, parent=None):
+    def __init__(self, model_class: type, index_last_stretch_colum: int | None = None, parent=None):
         """
         Initialize base view with model configuration / Инициализация базового представления с конфигурацией модели
         
@@ -61,13 +61,13 @@ class BaseView(QTableView):
         self.setup_shortcuts()
 
         # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
-        self._model.data_changed.connect(self.resizeColumnsToContents)
+        self._model.data_changed.connect(self.on_data_changed)
 
         self.lg.debug("Setup shortcuts and view completed successfully.")
 
     # ===== PRIVATE METHODS - UI SETUP / ПРИВАТНЫЕ МЕТОДЫ - НАСТРОЙКА UI =====
     
-    def setup_table_view(self):
+    def setup_table_view(self) -> None:
         """
         Table appearance configuration / Настройка внешнего вида таблицы
         
@@ -98,6 +98,7 @@ class BaseView(QTableView):
             # ===== SORTING AND DISPLAY / СОРТИРОВКА И ОТОБРАЖЕНИЕ =====
             # Enable column sorting / Включить сортировку колонок
             self.setSortingEnabled(True)
+            self.sortByColumn(1, Qt.SortOrder.DescendingOrder)
             # Hide ID column (first column) from user view / Скрыть ID колонку (первая колонка) от пользователя
             self.hideColumn(0)
 
@@ -111,7 +112,7 @@ class BaseView(QTableView):
         except Exception as e:
             self.lg.critical(f"Internal error: {e}.")
 
-    def setup_shortcuts(self):
+    def setup_shortcuts(self) -> None:
         """
         Keyboard shortcuts configuration / Настройка горячих клавиш
         
@@ -151,7 +152,7 @@ class BaseView(QTableView):
 
     # ===== PUBLIC METHODS - CRUD OPERATIONS / ПУБЛИЧНЫЕ МЕТОДЫ - ОПЕРАЦИИ CRUD =====
     
-    def add(self):
+    def add(self) -> None:
         """
         Add new record operation / Операция добавления новой записи
         
@@ -165,7 +166,7 @@ class BaseView(QTableView):
                               "The add() method must be redefined in the inheritor")
         self.lg.warning("BaseView add() method called but not implemented in child class")
 
-    def uppdate(self):
+    def uppdate(self) -> None:
         """
         Show information about direct table editing / Информация о редактировании напрямую в таблице
         
@@ -185,7 +186,7 @@ class BaseView(QTableView):
                                 "• Ctrl+Delete - delete selected records\n"
                                 "• Ctrl+A - select all")
 
-    def delete(self):
+    def delete(self) -> None:
         """
         Delete single selected record / Удаление выбранной записи
         
@@ -247,7 +248,7 @@ class BaseView(QTableView):
         except Exception as e:
             self.lg.error(f"BaseView internal error: {e}. In DEF delete().")
 
-    def delete_selected(self):
+    def delete_selected(self) -> None:
         """
         Delete all selected records / Удаление всех выбранных записей
         
@@ -311,6 +312,10 @@ class BaseView(QTableView):
         except Exception as e:
             self.lg.error(f"BaseView delete_selected error: {e}")
 
+    def on_data_changed(self):
+        """Обрабатывает изменения данных в таблице и применяет новые настройки при изменении"""
+        self.resizeColumnsToContents()
+        self.setup_table_view()
 
 # ===== MAIN EXECUTION BLOCK - FOR TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ДЛЯ ТЕСТИРОВАНИЯ =====
 if __name__ == '__main__':

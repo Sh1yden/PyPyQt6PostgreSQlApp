@@ -45,7 +45,7 @@ class MainMenu(QMenuBar):
         self._create_help_menu()
 
     # ===== TEACHER MENU SECTION / СЕКЦИЯ МЕНЮ УЧИТЕЛЯ =====
-    def _create_teacher_menu(self):
+    def _create_teacher_menu(self) -> None:
         """Create teacher management menu with CRUD operations / Создание меню управления учителями с CRUD операциями"""
         # Create main teacher menu / Создание основного меню учителя
         teacher_menu = self.addMenu("Teacher")
@@ -58,7 +58,7 @@ class MainMenu(QMenuBar):
         self.lg.debug("Teacher_menu add successfully.")
 
     # ===== STUDENT MENU SECTION / СЕКЦИЯ МЕНЮ СТУДЕНТА =====
-    def _create_student_menu(self):
+    def _create_student_menu(self) -> None:
         """Create student management menu with CRUD operations / Создание меню управления студентами с CRUD операциями"""
         # Create main student menu / Создание основного меню студента
         student_menu = self.addMenu("Student")
@@ -71,7 +71,7 @@ class MainMenu(QMenuBar):
         self.lg.debug("Student_menu add successfully.")
 
     # ===== GROUP MENU SECTION / СЕКЦИЯ МЕНЮ ГРУППЫ =====
-    def _create_group_menu(self):
+    def _create_group_menu(self) -> None:
         """Create group management menu with CRUD operations / Создание меню управления группами с CRUD операциями"""
         # Create main group menu / Создание основного меню группы
         st_group_menu = self.addMenu("Group")
@@ -84,7 +84,7 @@ class MainMenu(QMenuBar):
         self.lg.debug("St_group_menu add successfully.")
 
     # ===== HELP MENU SECTION / СЕКЦИЯ МЕНЮ СПРАВКИ =====
-    def _create_help_menu(self):
+    def _create_help_menu(self) -> None:
         """Create help and information menu / Создание меню справки и информации"""
         # Create main help menu / Создание основного меню справки
         help_menu = self.addMenu("Help")

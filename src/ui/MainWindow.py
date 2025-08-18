@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
 
     # ===== PRIVATE METHODS - INITIALIZATION HELPERS / ПРИВАТНЫЕ МЕТОДЫ - ПОМОЩНИКИ ИНИЦИАЛИЗАЦИИ =====
 
-    def _setup_window_properties(self):
+    def _setup_window_properties(self) -> None:
         """
         Configure main window properties / Настройка свойств главного окна
 
@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
 
         self.lg.debug("Window properties configured successfully.")
 
-    def _setup_menu_system(self):
+    def _setup_menu_system(self) -> None:
         """
         Initialize and configure the main menu system / Инициализация и настройка системы главного меню
 
@@ -113,7 +113,7 @@ class MainWindow(QMainWindow):
 
         self.lg.debug("Menu system configured successfully.")
 
-    def _setup_central_widget(self):
+    def _setup_central_widget(self) -> None:
         """
         Configure the central widget display / Настройка отображения центрального виджета
 
@@ -142,7 +142,7 @@ class MainWindow(QMainWindow):
 
         self.lg.debug("Central widget configured successfully.")
 
-    def _connect_menu_signals(self):
+    def _connect_menu_signals(self) -> None:
         """
         Connect menu actions to their respective handlers / Подключение действий меню к соответствующим обработчикам
 
@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
     # ===== SLOT METHODS - MENU ACTION HANDLERS / МЕТОДЫ-СЛОТЫ - ОБРАБОТЧИКИ ДЕЙСТВИЙ МЕНЮ =====
 
     @pyqtSlot()
-    def about(self):
+    def about(self) -> None:
         """
         Show information about the program / Показать информацию о программе
 
@@ -204,7 +204,7 @@ class MainWindow(QMainWindow):
         self.lg.debug("About program dialog shown.")
 
     @pyqtSlot()
-    def about_qt(self):
+    def about_qt(self) -> None:
         """
         Show information about Qt framework / Показать информацию о фреймворке Qt
 
@@ -219,7 +219,7 @@ class MainWindow(QMainWindow):
 
     # ===== PUBLIC METHODS - UTILITY FUNCTIONS / ПУБЛИЧНЫЕ МЕТОДЫ - УТИЛИТАРНЫЕ ФУНКЦИИ =====
 
-    def switch_to_teacher_view(self):
+    def switch_to_teacher_view(self) -> None:
         """
         Switch central widget to Teacher view / Переключить центральный виджет на представление Teacher
 
@@ -232,7 +232,7 @@ class MainWindow(QMainWindow):
         # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
         self.lg.info("Switching to Teacher view requested.")
 
-    def switch_to_student_view(self):
+    def switch_to_student_view(self) -> None:
         """
         Switch central widget to Student view / Переключить центральный виджет на представление Student
 
@@ -245,7 +245,7 @@ class MainWindow(QMainWindow):
         # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
         self.lg.info("Switching to Student view requested.")
 
-    def switch_to_group_view(self):
+    def switch_to_group_view(self) -> None:
         """
         Switch central widget to Group view / Переключить центральный виджет на представление Group
 

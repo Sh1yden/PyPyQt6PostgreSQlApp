@@ -87,7 +87,7 @@ class Logger:
 
     # ===== PRIVATE METHODS - FILE MANAGEMENT / ПРИВАТНЫЕ МЕТОДЫ - УПРАВЛЕНИЕ ФАЙЛАМИ =====
 
-    def _name_of_logs(self):
+    def _name_of_logs(self) -> Path | None:
         """
         Create unique log file name based on date and sequence / Создание уникального имени файла логов на основе даты и последовательности
 
@@ -133,7 +133,7 @@ class Logger:
 
     # ===== PRIVATE METHODS - CORE LOGGING / ПРИВАТНЫЕ МЕТОДЫ - ОСНОВНОЕ ЛОГИРОВАНИЕ =====
 
-    def _univ_log(self, message: str, tag: str):
+    def _univ_log(self, message: str, tag: str) -> None:
         """
         Universal logging template to avoid code repetition / Универсальный шаблон логирования, чтобы не повторять код
 
@@ -176,7 +176,7 @@ class Logger:
         try:
             # Output to console for immediate feedback / Вывод в консоль для немедленной обратной связи
             print(self._DEF_STRUCTURE, file=sys.stderr)
-            self._appcfg.save_to_log(self._NAME_OF_LOG, self._DEF_STRUCTURE)
+            self._appcfg.save_to_file(self._NAME_OF_LOG ,self._DEF_STRUCTURE, jsonl=True)
         except Exception as e:
             # Set error flag and attempt fallback logging / Установка флага ошибки и попытка резервного логирования
             self._internal_error_occurred = True
@@ -184,7 +184,7 @@ class Logger:
 
     # ===== PUBLIC METHODS - LOG LEVELS / ПУБЛИЧНЫЕ МЕТОДЫ - УРОВНИ ЛОГИРОВАНИЯ =====
 
-    def debug(self, message="TEST, INPUT VALUE!!!", tag="DEBUG"):
+    def debug(self, message="TEST, INPUT VALUE!!!", tag="DEBUG") -> None:
         """
         Debug level logging / Логирование уровня отладки
 
@@ -201,7 +201,7 @@ class Logger:
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["DEBUG"]:
             self._univ_log(message=message, tag=tag)
 
-    def info(self, message="TEST, INPUT VALUE!!!", tag="INFO"):
+    def info(self, message="TEST, INPUT VALUE!!!", tag="INFO") -> None:
         """
         Info level logging / Логирование информационного уровня
 
@@ -218,7 +218,7 @@ class Logger:
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["INFO"]:
             self._univ_log(message=message, tag=tag)
 
-    def warning(self, message="TEST, INPUT VALUE!!!", tag="WARN"):
+    def warning(self, message="TEST, INPUT VALUE!!!", tag="WARN") -> None:
         """
         Warning level logging / Логирование уровня предупреждений
 
@@ -235,7 +235,7 @@ class Logger:
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["WARNING"]:
             self._univ_log(message=message, tag=tag)
 
-    def error(self, message="TEST, INPUT VALUE!!!", tag="ERROR"):
+    def error(self, message="TEST, INPUT VALUE!!!", tag="ERROR") -> None:
         """
         Error level logging / Логирование уровня ошибок
 
@@ -252,7 +252,7 @@ class Logger:
         if self._appcfg.lg_lvl >= self._appcfg.lg_all_set["ERROR"]:
             self._univ_log(message=message, tag=tag)
 
-    def critical(self, message="TEST, INPUT VALUE!!!", tag="CRIT"):
+    def critical(self, message="TEST, INPUT VALUE!!!", tag="CRIT") -> None:
         """
         Critical level logging / Логирование критического уровня
 

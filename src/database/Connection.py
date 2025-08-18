@@ -1,6 +1,8 @@
 # ===== DATABASE CONNECTION CLASS / КЛАСС ПОДКЛЮЧЕНИЯ К БАЗЕ ДАННЫХ =====
 
 # ===== IMPORTS / ИМПОРТЫ =====
+
+from typing import Any
 # PostgreSQL database adapter imports / Импорты адаптера базы данных PostgreSQL
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -47,7 +49,7 @@ class Connection:
         self.connection = None
 
     # ===== CONNECTION MANAGEMENT / УПРАВЛЕНИЕ СОЕДИНЕНИЯМИ =====
-    def connect_to_db(self):
+    def connect_to_db(self) -> None:
         """
         Establish connection to PostgreSQL database / Установление соединения с базой данных PostgreSQL
 
@@ -80,7 +82,7 @@ class Connection:
             self.lg.critical(f"Internal error: {e}.")
             raise
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         """
         Safely close database connection / Безопасное закрытие соединения с базой данных
 
@@ -101,7 +103,7 @@ class Connection:
             self.lg.error(f"Internal error: {e}.")
 
     # ===== QUERY EXECUTION / ВЫПОЛНЕНИЕ ЗАПРОСОВ =====
-    def execute_query(self, query, params=None):
+    def execute_query(self, query, params: Any | None = None) -> list | None:
         """
         Execute SQL query with optional parameters / Выполнение SQL запроса с опциональными параметрами
 

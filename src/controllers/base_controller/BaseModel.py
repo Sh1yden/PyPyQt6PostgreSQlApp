@@ -3,7 +3,8 @@
 # Универсальный класс модели для управления таблицами базы данных
 
 # ===== IMPORTS / ИМПОРТЫ =====
-from PyQt6.QtCore import pyqtSignal, Qt
+from typing import Any
+from PyQt6.QtCore import pyqtSignal, Qt, QModelIndex
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtWidgets import QMessageBox
 import psycopg2
@@ -74,11 +75,12 @@ class BaseModel(QStandardItemModel):
         self.condb = Connection()
 
         # ===== INITIAL DATA LOAD / НАЧАЛЬНАЯ ЗАГРУЗКА ДАННЫХ =====
+        self._initialized = False
         self.refresh_data()
 
     # ===== PUBLIC METHODS - DATA OPERATIONS / ПУБЛИЧНЫЕ МЕТОДЫ - ОПЕРАЦИИ С ДАННЫМИ =====
 
-    def refresh_data(self):
+    def refresh_data(self) -> None:
         """
         Load data from database into model / Загрузка данных из БД в модель
 
@@ -91,34 +93,36 @@ class BaseModel(QStandardItemModel):
         Автоматически обновляет пользовательский интерфейс после загрузки.
         """
         try:
-            # Execute SELECT query to get all table data / Выполнение SELECT запроса для получения всех данных таблицы
             rows = self.condb.execute_query(self.queries['select'])
 
-            # Clear table before loading new data / Очищаем таблицу перед загрузкой новых данных
-            self.clear()
-            self.setRowCount(0)
-            self.setColumnCount(0)
+            # Полная инициализация только при первом запуске
+            if not self._initialized:
+                self.clear()
+                self.setRowCount(0)
+                self.setColumnCount(0)
+                self._initialized = True
+            else:
+                # При последующих обновлениях очищаем только строки
+                self.removeRows(0, self.rowCount())
 
             if rows:
-                # Extract column names from the first row / Извлечение имен колонок из первой строки
                 self.column_names = list(rows[0].keys())
                 columns = self.column_names
 
-                # Configure table dimensions / Настраиваем размеры таблицы
-                self.setRowCount(len(rows))
-                self.setColumnCount(len(columns))
-                self.setHorizontalHeaderLabels(columns)
+                # Настройка колонок только при первой инициализации
+                if self.columnCount() == 0:
+                    self.setColumnCount(len(columns))
+                    self.setHorizontalHeaderLabels(columns)
 
-                # Populate model with data / Заполняем модель данными
+                # Заполнение данными
+                self.setRowCount(len(rows))
                 for row_idx, row in enumerate(rows):
                     for col_idx, column_name in enumerate(columns):
                         cell_value = row[column_name]
-                        # Create item with string representation of value / Создание элемента со строковым представлением значения
                         item = QStandardItem(str(cell_value) if cell_value is not None else "")
                         self.setItem(row_idx, col_idx, item)
 
-                self.lg.debug("Refresh data successfully.")
-
+            self.lg.debug("Refresh data successfully.")
         except psycopg2.Error as e:
             # Handle PostgreSQL specific errors / Обработка специфических ошибок PostgreSQL
             self.lg.error(f"Psycopg2 internal error: {e}.")
@@ -126,7 +130,7 @@ class BaseModel(QStandardItemModel):
             # Handle general exceptions / Обработка общих исключений
             self.lg.critical(f"Internal error: {e}.")
 
-    def add(self, *args):
+    def add(self, *args: Any | None) -> bool:
         """
         Add new record to database / Добавление новой записи в БД
 
@@ -158,7 +162,7 @@ class BaseModel(QStandardItemModel):
             self.lg.critical(f"Internal error: {e}.")
             return False
 
-    def delete_record(self, record_id):
+    def delete_record(self, record_id: int | str) -> bool:
         """
         Delete record from database / Удаление записи из БД
 
@@ -190,7 +194,7 @@ class BaseModel(QStandardItemModel):
 
     # ===== OVERRIDE METHODS - EDITING OPERATIONS / ПЕРЕОПРЕДЕЛЕННЫЕ МЕТОДЫ - ОПЕРАЦИИ РЕДАКТИРОВАНИЯ =====
 
-    def flags(self, index):
+    def flags(self, index: QModelIndex):
         """
         Determine which cells can be edited / Определяет какие ячейки можно редактировать
 
@@ -220,7 +224,7 @@ class BaseModel(QStandardItemModel):
             self.lg.error(f"Internal error: {e}.")
             return Qt.ItemFlag.NoItemFlags
 
-    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole) -> bool:
         """
         Handle cell data changes / Обработка изменения данных в ячейке
 

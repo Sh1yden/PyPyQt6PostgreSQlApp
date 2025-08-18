@@ -69,7 +69,7 @@ class View(BaseView):
         )
 
     # ===== CRUD OPERATIONS / ОПЕРАЦИИ CRUD =====
-    def add(self):
+    def add(self) -> None:
         """
         Add new student group record through dialog / Добавление новой записи группы студентов через диалог
 
