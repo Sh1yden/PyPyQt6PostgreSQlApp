@@ -7,6 +7,7 @@ import datetime
 from pathlib import Path
 import os
 import sys
+import inspect
 from src.config.AppConfig import AppConfig
 
 
@@ -79,6 +80,7 @@ class Logger:
             # Current date for log file naming / Текущая дата для именования файлов логов
             self._DATE = f"{datetime.datetime.now().strftime('%Y-%m-%d')}"
             # Log file name for program runtime, to avoid creating new ones / Имя файла логов на время выполнения программы, чтобы новые не создавать
+            self._DEF_STRUCTURE = {}
             self._NAME_OF_LOG = self._name_of_logs()
             # Temporary buffer for log data / Временный буфер для данных логов
             self._lg_var = {}
@@ -104,7 +106,7 @@ class Logger:
 
             # If no files in directory, set name with 01 / Если файлов в директории нет, задаём имя с 01
             if len(logs_list) < 1:
-                save_file_name = Path(f"{self._appcfg.save_lg_dir}/{self._DATE}-{"01"}.json")
+                save_file_name = Path(f"{self._appcfg.save_lg_dir}/{self._DATE}-{"01"}.jsonl")
             else:
                 # Otherwise give name + 1 from existing maximum in directory / Иначе выдаём имя + 1 от существующего максимального в директории
                 # Create list with sequential values 01, 02, etc. / Создание списка с последовательными значениями 01, 02 и т.д.
@@ -116,18 +118,18 @@ class Logger:
                 next_sequence = int(max(name_logs_list)) + 1
                 if next_sequence < 10:
                     save_file_name = Path(
-                        f"{self._appcfg.save_lg_dir}/{self._DATE}-0{next_sequence}.json"
+                        f"{self._appcfg.save_lg_dir}/{self._DATE}-0{next_sequence}.jsonl"
                     )
                 else:
                     save_file_name = Path(
-                        f"{self._appcfg.save_lg_dir}/{self._DATE}-{next_sequence}.json"
+                        f"{self._appcfg.save_lg_dir}/{self._DATE}-{next_sequence}.jsonl"
                     )
 
             return save_file_name
         except Exception as e:
             # Set error flag and log to console as fallback / Установка флага ошибки и логирование в консоль как резервный вариант
             self._internal_error_occurred = True
-            self.critical(f"Logger internal error: {e}. In DEF _name_of_logs().")
+            self.critical(f"Internal error: {e}")
 
     # ===== PRIVATE METHODS - CORE LOGGING / ПРИВАТНЫЕ МЕТОДЫ - ОСНОВНОЕ ЛОГИРОВАНИЕ =====
 
@@ -145,27 +147,40 @@ class Logger:
             message (str): Message to log / Сообщение для логирования
             tag (str): Log level tag (DEBUG, INFO, etc.) / Тег уровня логирования (DEBUG, INFO и т.д.)
         """
+        stack = inspect.stack()
+        caller_frame = stack[2].frame
+
         # Generate timestamp with millisecond precision / Генерация временной метки с точностью до миллисекунд
         current_time = datetime.datetime.now().strftime('%H:%M:%S.%f')
+        file_name = Path(inspect.getfile(caller_frame)).name
+        module = inspect.getmodule(caller_frame).__name__
+        deff = caller_frame.f_code.co_name
+        cls_obj = caller_frame.f_locals.get("self", None)
+        cls_name = cls_obj.__class__.__name__ if cls_obj else None
+
+        self._DEF_STRUCTURE = {
+            "timestamp": current_time,
+            "level": tag,
+            "filename": file_name,
+            "module": module,
+            "class": cls_name,
+            "def": deff,
+            "message": message
+        }
 
         # Protection from internal class errors and recursion / Защита от внутренних ошибок класса и рекурсии
         if self._internal_error_occurred:
-            print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
+            print(self._DEF_STRUCTURE, file=sys.stderr)
             return
 
         try:
             # Output to console for immediate feedback / Вывод в консоль для немедленной обратной связи
-            print(f"[{current_time}] [{tag}]: {message}", file=sys.stderr)
-
-            # Load existing log data, add new entry, and save back to file / Загрузка существующих данных логов, добавление новой записи и сохранение обратно в файл
-            self._appcfg.save_to_file(self._NAME_OF_LOG, self._lg_var)
-            self._lg_var = self._appcfg.load_from_file(self._NAME_OF_LOG)
-            self._lg_var.update({f"[{current_time}] [{tag}]": f"{message}"})
-            self._appcfg.save_to_file(self._NAME_OF_LOG, self._lg_var)
+            print(self._DEF_STRUCTURE, file=sys.stderr)
+            self._appcfg.save_to_log(self._NAME_OF_LOG, self._DEF_STRUCTURE)
         except Exception as e:
             # Set error flag and attempt fallback logging / Установка флага ошибки и попытка резервного логирования
             self._internal_error_occurred = True
-            self.critical(f"Logger internal error: {e}. In DEF _univ_log().")
+            self.critical(f"Internal error: {e}")
 
     # ===== PUBLIC METHODS - LOG LEVELS / ПУБЛИЧНЫЕ МЕТОДЫ - УРОВНИ ЛОГИРОВАНИЯ =====
 

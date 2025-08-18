@@ -34,8 +34,8 @@ class MainMenu(QMenuBar):
         # ===== LOGGING SETUP / НАСТРОЙКА ЛОГИРОВАНИЯ =====
         # Initialize logger for menu operations / Инициализация логгера для операций меню
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class MainMenu.")
-        self.lg.debug("Logger created in class MainMenu().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")
 
         # ===== MENU STRUCTURE CREATION / СОЗДАНИЕ СТРУКТУРЫ МЕНЮ =====
         # Create all menu sections in logical order / Создание всех секций меню в логическом порядке
@@ -55,7 +55,7 @@ class MainMenu(QMenuBar):
         self.teacher_update = teacher_menu.addAction("Update")    # Update existing teacher / Обновить существующего учителя
         self.teacher_delete = teacher_menu.addAction("Delete")    # Delete selected teacher / Удалить выбранного учителя
 
-        self.lg.debug("MainMenu teacher_menu add successfully. In DEF _create_teacher_menu().")
+        self.lg.debug("Teacher_menu add successfully.")
 
     # ===== STUDENT MENU SECTION / СЕКЦИЯ МЕНЮ СТУДЕНТА =====
     def _create_student_menu(self):
@@ -68,7 +68,7 @@ class MainMenu(QMenuBar):
         self.student_update = student_menu.addAction("Update")    # Update existing student / Обновить существующего студента
         self.student_delete = student_menu.addAction("Delete")    # Delete selected student / Удалить выбранного студента
 
-        self.lg.debug("MainMenu student_menu add successfully. In DEF _create_student_menu().")
+        self.lg.debug("Student_menu add successfully.")
 
     # ===== GROUP MENU SECTION / СЕКЦИЯ МЕНЮ ГРУППЫ =====
     def _create_group_menu(self):
@@ -81,7 +81,7 @@ class MainMenu(QMenuBar):
         self.st_group_update = st_group_menu.addAction("Update")    # Update existing group / Обновить существующую группу
         self.st_group_delete = st_group_menu.addAction("Delete")    # Delete selected group / Удалить выбранную группу
 
-        self.lg.debug("MainMenu st_group_menu add successfully. In DEF _create_group_menu().")
+        self.lg.debug("St_group_menu add successfully.")
 
     # ===== HELP MENU SECTION / СЕКЦИЯ МЕНЮ СПРАВКИ =====
     def _create_help_menu(self):
@@ -93,4 +93,4 @@ class MainMenu(QMenuBar):
         self.about = help_menu.addAction("About program...")    # Show program information / Показать информацию о программе
         self.about_qt = help_menu.addAction("About qt...")      # Show Qt framework information / Показать информацию о фреймворке Qt
 
-        self.lg.debug("MainMenu help_menu add successfully. In DEF _create_help_menu().")
+        self.lg.debug("Help_menu add successfully.")

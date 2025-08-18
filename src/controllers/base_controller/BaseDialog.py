@@ -45,8 +45,8 @@ class BaseDialog(QDialog):
 
         # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГЕРА =====
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class BaseDialog.")
-        self.lg.debug("Logger created in class BaseDialog().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")
 
         # ===== DIALOG SETUP / НАСТРОЙКА ДИАЛОГА =====
         self.set_window_dialog(window_title, fields)
@@ -150,7 +150,7 @@ class BaseDialog(QDialog):
         """
         # ===== REQUIRED FIELD VALIDATION / ВАЛИДАЦИЯ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ =====
         if self.fio is None:
-            self.lg.debug("BaseDialog: No FIO input provided. In DEF finish().")
+            self.lg.debug("No FIO input provided.")
             QMessageBox.information(self,
                                     "Please input Surname N.P!!!",
                                     "Please input Surname N.P!!! This is necessary.")
@@ -158,7 +158,7 @@ class BaseDialog(QDialog):
             
         # ===== DIALOG ACCEPTANCE / ПРИНЯТИЕ ДИАЛОГА =====
         self.accept()  # Close dialog with acceptance / Закрыть диалог с принятием
-        self.lg.debug("BaseDialog: Dialog accepted successfully. In DEF finish().")
+        self.lg.debug("Dialog accepted successfully.")
 
     # ===== PROPERTY METHODS - DATA ACCESS / МЕТОДЫ-СВОЙСТВА - ДОСТУП К ДАННЫМ =====
     
@@ -180,7 +180,7 @@ class BaseDialog(QDialog):
         if result == "":
             return None
         else:
-            self.lg.debug("BaseDialog: FIO input successful. In DEF fio().")
+            self.lg.debug("FIO input successful.")
             return result
 
     @property
@@ -199,10 +199,10 @@ class BaseDialog(QDialog):
         """
         result = self.__phone_edit.text().strip()
         if result == "":
-            self.lg.debug("BaseDialog: No phone input provided. In DEF phone().")
+            self.lg.debug("No phone input provided.")
             return None
         else:
-            self.lg.debug("BaseDialog: Phone input successful. In DEF phone().")
+            self.lg.debug("Phone input successful.")
             return result
 
     @property
@@ -221,11 +221,10 @@ class BaseDialog(QDialog):
         """
         result = self.__email_edit.text().strip()
         if result == "":
-            self.lg.debug("BaseDialog: No email input provided. In DEF email().")
+            self.lg.debug("No email input provided.")
             return None
         else:
-            # TODO: Add email format validation / TODO: Добавить валидацию формата email
-            self.lg.debug("BaseDialog: Email input successful. In DEF email().")
+            self.lg.debug("Email input successful.")
             return result
 
     @property
@@ -244,10 +243,10 @@ class BaseDialog(QDialog):
         """
         result = self.__comment_edit.toPlainText().strip()
         if result == "":
-            self.lg.debug("BaseDialog: No comment input provided. In DEF comment().")
+            self.lg.debug("No comment input provided.")
             return None
         else:
-            self.lg.debug("BaseDialog: Comment input successful. In DEF comment().")
+            self.lg.debug("Comment input successful.")
             return result
 
 

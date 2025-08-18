@@ -54,8 +54,8 @@ class MainWindow(QMainWindow):
 
         # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГЕРА =====
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class MainWindow.")
-        self.lg.debug("Logger created in class MainWindow().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")
 
         # ===== WINDOW CONFIGURATION / КОНФИГУРАЦИЯ ОКНА =====
         self._setup_window_properties()
@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
         # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
         self._connect_menu_signals()
 
-        self.lg.debug("MainWindow initialization completed successfully.")
+        self.lg.debug("Initialization completed successfully.")
 
     # ===== PRIVATE METHODS - INITIALIZATION HELPERS / ПРИВАТНЫЕ МЕТОДЫ - ПОМОЩНИКИ ИНИЦИАЛИЗАЦИИ =====
 
@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
             self._icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
         self.setWindowIcon(self._icon)
 
-        self.lg.debug("MainWindow window properties configured successfully.")
+        self.lg.debug("Window properties configured successfully.")
 
     def _setup_menu_system(self):
         """
@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.main_menu = MainMenu(parent=self)
         self.setMenuBar(self.main_menu)  # Set main menu for window / установка главного меню для окна
 
-        self.lg.debug("MainWindow menu system configured successfully.")
+        self.lg.debug("Menu system configured successfully.")
 
     def _setup_central_widget(self):
         """
@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
         # self.st_group_view = View()
         # self.setCentralWidget(self.st_group_view)
 
-        self.lg.debug("MainWindow central widget configured successfully.")
+        self.lg.debug("Central widget configured successfully.")
 
     def _connect_menu_signals(self):
         """
@@ -175,7 +175,7 @@ class MainWindow(QMainWindow):
         self.main_menu.about.triggered.connect(self.about)
         self.main_menu.about_qt.triggered.connect(self.about_qt)
 
-        self.lg.debug("MainWindow menu signals connected successfully.")
+        self.lg.debug("Menu signals connected successfully.")
 
     # ===== SLOT METHODS - MENU ACTION HANDLERS / МЕТОДЫ-СЛОТЫ - ОБРАБОТЧИКИ ДЕЙСТВИЙ МЕНЮ =====
 
@@ -201,7 +201,7 @@ class MainWindow(QMainWindow):
                          "• Student management / Управление учениками\n"  
                          "• Group management / Управление группами\n"
                          "• Database integration / Интеграция с базой данных")
-        self.lg.debug("MainWindow about program dialog shown. In DEF about().")
+        self.lg.debug("About program dialog shown.")
 
     @pyqtSlot()
     def about_qt(self):
@@ -215,7 +215,7 @@ class MainWindow(QMainWindow):
         версии фреймворка Qt и лицензировании.
         """
         QMessageBox.aboutQt(self, "About Qt")
-        self.lg.debug("MainWindow about Qt dialog shown. In DEF about_qt().")
+        self.lg.debug("About Qt dialog shown.")
 
     # ===== PUBLIC METHODS - UTILITY FUNCTIONS / ПУБЛИЧНЫЕ МЕТОДЫ - УТИЛИТАРНЫЕ ФУНКЦИИ =====
 

@@ -40,5 +40,5 @@ class Application(QApplication):
 
         # Log application startup events for debugging /
         # Логирование событий запуска приложения для отладки
-        self.lg.debug("Constructor launched in class Application.")
-        self.lg.debug("Logger created in class Application().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")

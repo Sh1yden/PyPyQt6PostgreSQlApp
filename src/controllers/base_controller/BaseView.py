@@ -44,8 +44,8 @@ class BaseView(QTableView):
 
         # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГЕРА =====
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class BaseView.")
-        self.lg.debug("Logger created in class BaseView().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")
 
         # ===== CONFIGURATION STORAGE / СОХРАНЕНИЕ КОНФИГУРАЦИИ =====
         self.model_class = model_class
@@ -61,9 +61,9 @@ class BaseView(QTableView):
         self.setup_shortcuts()
 
         # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
-        self._model.data_changed.connect(self.on_data_changed)
+        self._model.data_changed.connect(self.resizeColumnsToContents)
 
-        self.lg.debug("BaseView setup completed successfully.")
+        self.lg.debug("Setup shortcuts and view completed successfully.")
 
     # ===== PRIVATE METHODS - UI SETUP / ПРИВАТНЫЕ МЕТОДЫ - НАСТРОЙКА UI =====
     
@@ -107,9 +107,9 @@ class BaseView(QTableView):
             # Disable word wrap for consistent display / Отключить перенос слов для согласованного отображения
             self.setWordWrap(False)
 
-            self.lg.debug("BaseView table setup successfully.")
+            self.lg.debug("Table setup successfully.")
         except Exception as e:
-            self.lg.critical(f"BaseView internal error: {e}. In DEF setup_table_view().")
+            self.lg.critical(f"Internal error: {e}.")
 
     def setup_shortcuts(self):
         """
@@ -145,25 +145,9 @@ class BaseView(QTableView):
             )
             select_all_shortcut.activated.connect(self.selectAll)
 
-            self.lg.debug("BaseView shortcuts setup successfully.")
+            self.lg.debug("Shortcuts setup successfully.")
         except Exception as e:
-            self.lg.error(f"BaseView internal error: {e}. In DEF setup_shortcuts().")
-
-    # ===== SLOT METHODS - EVENT HANDLERS / МЕТОДЫ-СЛОТЫ - ОБРАБОТЧИКИ СОБЫТИЙ =====
-    
-    @pyqtSlot()
-    def on_data_changed(self):
-        """
-        Handle data changes in model / Обработка изменения данных в модели
-        
-        Called automatically when the underlying model data changes.
-        Refreshes the view display to reflect the updated data.
-        
-        Вызывается автоматически при изменении данных базовой модели.
-        Обновляет отображение представления для отражения обновленных данных.
-        """
-        self.lg.debug("BaseView data changed in model, refreshing view.")
-        self.resizeColumnsToContents()
+            self.lg.error(f"Internal error: {e}.")
 
     # ===== PUBLIC METHODS - CRUD OPERATIONS / ПУБЛИЧНЫЕ МЕТОДЫ - ОПЕРАЦИИ CRUD =====
     

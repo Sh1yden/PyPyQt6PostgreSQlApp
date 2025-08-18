@@ -33,8 +33,8 @@ class Connection:
         # ===== LOGGING SETUP / НАСТРОЙКА ЛОГИРОВАНИЯ =====
         # Initialize logger for database operations / Инициализация логгера для операций с БД
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class Connection.")
-        self.lg.debug("Logger created in class Connection().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")
 
         # ===== CONFIGURATION SETUP / НАСТРОЙКА КОНФИГУРАЦИИ =====
         # Load application configuration for database settings /
@@ -70,14 +70,14 @@ class Connection:
                 # Установление нового соединения с параметрами конфигурации
                 self.connection = psycopg2.connect(**db_config)
 
-                self.lg.debug("Connection Connected to DB. In DEF connect_to_db().")
+                self.lg.debug("Connected to DB.")
 
             return self.connection
 
         except Exception as e:
             # Log critical error for connection failure /
             # Логирование критической ошибки при неудаче соединения
-            self.lg.critical(f"Connection internal error: {e}. In DEF connect_to_db().")
+            self.lg.critical(f"Internal error: {e}.")
             raise
 
     def close_connection(self):
@@ -93,12 +93,12 @@ class Connection:
             if self.connection and not self.connection.closed:
                 self.connection.close()
                 self.connection = None  # Reset connection reference / Сброс ссылки на соединение
-                self.lg.debug("Connection Connection CLOSED. In DEF close_connection().")
+                self.lg.debug("Connection CLOSED.")
 
         except Exception as e:
             # Log error but don't raise to prevent cleanup issues /
             # Логирование ошибки без поднятия исключения для предотвращения проблем очистки
-            self.lg.error(f"Connection internal error: {e}. In DEF close_connection().")
+            self.lg.error(f"Internal error: {e}.")
 
     # ===== QUERY EXECUTION / ВЫПОЛНЕНИЕ ЗАПРОСОВ =====
     def execute_query(self, query, params=None):
@@ -141,7 +141,7 @@ class Connection:
         except Exception as e:
             # Log query execution errors for debugging /
             # Логирование ошибок выполнения запросов для отладки
-            self.lg.error(f"Connection internal error: {e}. In DEF execute_query().")
+            self.lg.error(f"Internal error: {e}.")
             raise
 
 

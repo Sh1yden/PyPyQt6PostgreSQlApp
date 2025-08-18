@@ -2,11 +2,6 @@
 # Universal model class for database table management
 # Универсальный класс модели для управления таблицами базы данных
 
-# TODO: Code review of all standard controllers, add hints, redo logs
-# TODO: Replace Model, View, Dialog in Teacher.py, Student.py, StGroup.py with base controller classes
-# TODO: сделать review кода всех стандартных контроллеров, добавить подсказки, переделать логи
-# TODO: Заменить Model, View, Dialog в Teacher.py, Student.py, StGroup.py на базовые классы контроллеров
-
 # ===== IMPORTS / ИМПОРТЫ =====
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
@@ -56,8 +51,8 @@ class BaseModel(QStandardItemModel):
 
         # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГЕРА =====
         self.lg = Logger()
-        self.lg.debug("Constructor launched in class BaseModel.")
-        self.lg.debug("Logger created in class BaseModel().")
+        self.lg.debug("Constructor launched.")
+        self.lg.debug("Logger created.")
 
         # ===== CONFIGURATION STORAGE / СОХРАНЕНИЕ КОНФИГУРАЦИИ =====
         # Store table configuration for later use / Сохранение конфигурации таблицы для последующего использования
@@ -73,7 +68,7 @@ class BaseModel(QStandardItemModel):
             'delete': QueryBuilder.delete(table_name)
         }
 
-        self.lg.debug(f"BaseModel Generated queries for {table_name}: {self.queries}")
+        self.lg.debug(f"Generated queries for {table_name}.")
 
         # ===== DATABASE CONNECTION SETUP / НАСТРОЙКА ПОДКЛЮЧЕНИЯ К БД =====
         self.condb = Connection()
@@ -122,14 +117,14 @@ class BaseModel(QStandardItemModel):
                         item = QStandardItem(str(cell_value) if cell_value is not None else "")
                         self.setItem(row_idx, col_idx, item)
 
-                self.lg.debug("BaseModel refresh data successfully. In DEF refresh_data().")
+                self.lg.debug("Refresh data successfully.")
 
         except psycopg2.Error as e:
             # Handle PostgreSQL specific errors / Обработка специфических ошибок PostgreSQL
-            self.lg.error(f"BaseModel psycopg2 internal error: {e}. In DEF refresh_data().")
+            self.lg.error(f"Psycopg2 internal error: {e}.")
         except Exception as e:
             # Handle general exceptions / Обработка общих исключений
-            self.lg.critical(f"BaseModel internal error: {e}. In DEF refresh_data().")
+            self.lg.critical(f"Internal error: {e}.")
 
     def add(self, *args):
         """
@@ -157,10 +152,10 @@ class BaseModel(QStandardItemModel):
             self.refresh_data()
             self.condb.close_connection()
 
-            self.lg.debug("BaseModel add data successfully. In DEF add().")
+            self.lg.debug("Add data successfully.")
             return True
         except Exception as e:
-            self.lg.critical(f"BaseModel internal error: {e}. In DEF add().")
+            self.lg.critical(f"Internal error: {e}.")
             return False
 
     def delete_record(self, record_id):
@@ -187,10 +182,10 @@ class BaseModel(QStandardItemModel):
             self.refresh_data()
             self.condb.close_connection()
 
-            self.lg.debug("BaseModel delete data successfully. In DEF delete_record().")
+            self.lg.debug("Delete data successfully.")
             return True
         except Exception as e:
-            self.lg.critical(f"BaseModel internal error: {e}. In DEF delete_record().")
+            self.lg.critical(f"Internal error: {e}.")
             return False
 
     # ===== OVERRIDE METHODS - EDITING OPERATIONS / ПЕРЕОПРЕДЕЛЕННЫЕ МЕТОДЫ - ОПЕРАЦИИ РЕДАКТИРОВАНИЯ =====
@@ -222,7 +217,7 @@ class BaseModel(QStandardItemModel):
             # Other columns can be edited / Остальные колонки можно редактировать
             return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
         except Exception as e:
-            self.lg.error(f"BaseModel internal error: {e}. In DEF flags().")
+            self.lg.error(f"Internal error: {e}.")
             return Qt.ItemFlag.NoItemFlags
 
     def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
@@ -262,7 +257,7 @@ class BaseModel(QStandardItemModel):
             # Get record ID from first column / Получаем ID записи (первая колонка)
             id_item = self.item(index.row(), 0)
             if not id_item:
-                self.lg.error(f"BaseModel {self.table_name} Model: no id item in setData")
+                self.lg.error(f"{self.table_name} Model: no id item in setData.")
                 return False
 
             record_id = id_item.text()
@@ -285,12 +280,12 @@ class BaseModel(QStandardItemModel):
             result = super().setData(index, value, role)
             if result:
                 self.data_changed.emit()
-                self.lg.debug(f"BaseModel {self.table_name} Model: updated {column_name} for record {record_id}")
+                self.lg.debug(f"{self.table_name} Model: updated {column_name} for record {record_id}.")
 
             return result
 
         except Exception as e:
-            self.lg.critical(f"BaseModel internal error: {e}. In DEF setData().")
+            self.lg.critical(f"Internal error: {e}.")
             # Show user-friendly error message / Показать удобное для пользователя сообщение об ошибке
             QMessageBox.warning(None, "Update error", f"Record could not be updated: {str(e)}")
             return False
