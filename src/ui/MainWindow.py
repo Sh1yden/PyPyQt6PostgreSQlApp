@@ -9,9 +9,9 @@ from PyQt6.QtGui import QIcon
 
 # ===== VIEW IMPORTS - ENTITY CONTROLLERS / ИМПОРТЫ ПРЕДСТАВЛЕНИЙ - КОНТРОЛЛЕРЫ СУЩНОСТЕЙ =====
 # ! Change display class here / ! Смена класса отображения здесь
-from src.controllers.Teacher import View  # Teacher view / Представление учителя
-# from src.controllers.Student import View  # Student view / Представление ученика
-# from src.controllers.StGroup import View  # Group view / Представление группы
+import src.controllers.Teacher as Teacher  # Teacher view / Представление учителя
+import src.controllers.Student as Student  # Student view / Представление ученика
+import src.controllers.StGroup as StGroup  # Group view / Представление группы
 
 # ===== UI COMPONENT IMPORTS / ИМПОРТЫ КОМПОНЕНТОВ UI =====
 from src.ui.MainMenu import MainMenu
@@ -63,9 +63,6 @@ class MainWindow(QMainWindow):
         # ===== MENU SYSTEM SETUP / НАСТРОЙКА СИСТЕМЫ МЕНЮ =====
         self._setup_menu_system()
 
-        # ===== CENTRAL WIDGET SETUP / НАСТРОЙКА ЦЕНТРАЛЬНОГО ВИДЖЕТА =====
-        self._setup_central_widget()
-
         # ===== SIGNAL CONNECTIONS / ПОДКЛЮЧЕНИЕ СИГНАЛОВ =====
         self._connect_menu_signals()
 
@@ -113,35 +110,6 @@ class MainWindow(QMainWindow):
 
         self.lg.debug("Menu system configured successfully.")
 
-    def _setup_central_widget(self) -> None:
-        """
-        Configure the central widget display / Настройка отображения центрального виджета
-
-        Sets up the main content area of the window with the appropriate view.
-        Currently configured to display Teacher view, but can be switched to other entities.
-
-        Настраивает основную область содержимого окна с соответствующим представлением.
-        В настоящее время настроен для отображения представления Teacher, но может быть переключен на другие сущности.
-        """
-        # ===== ENTITY VIEW SELECTION / ВЫБОР ПРЕДСТАВЛЕНИЯ СУЩНОСТИ =====
-        # Create and set Teacher.View as central widget / Создание и установка Teacher.View как центрального виджета
-
-        # ===== TEACHER VIEW (CURRENTLY ACTIVE) / ПРЕДСТАВЛЕНИЕ УЧИТЕЛЯ (АКТИВНО В ДАННЫЙ МОМЕНТ) =====
-        self.teacher_view = View()
-        self.setCentralWidget(self.teacher_view)
-
-        # ===== STUDENT VIEW (COMMENTED OUT) / ПРЕДСТАВЛЕНИЕ УЧЕНИКА (ЗАКОММЕНТИРОВАНО) =====
-        # Uncomment to switch to Student view / Раскомментировать для переключения на представление Student
-        # self.student_view = View()
-        # self.setCentralWidget(self.student_view)
-
-        # ===== GROUP VIEW (COMMENTED OUT) / ПРЕДСТАВЛЕНИЕ ГРУППЫ (ЗАКОММЕНТИРОВАНО) =====
-        # Uncomment to switch to Group view / Раскомментировать для переключения на представление Group
-        # self.st_group_view = View()
-        # self.setCentralWidget(self.st_group_view)
-
-        self.lg.debug("Central widget configured successfully.")
-
     def _connect_menu_signals(self) -> None:
         """
         Connect menu actions to their respective handlers / Подключение действий меню к соответствующим обработчикам
@@ -153,22 +121,13 @@ class MainWindow(QMainWindow):
         Связывает действия пользовательского интерфейса с операциями бизнес-логики.
         """
         # ===== TEACHER MENU CONNECTIONS / ПОДКЛЮЧЕНИЯ МЕНЮ УЧИТЕЛЯ =====
-        # Connect Teacher menu actions to Teacher view methods / Подключение действий меню Teacher к методам представления Teacher
-        self.main_menu.teacher_add.triggered.connect(self.teacher_view.add)
-        self.main_menu.teacher_update.triggered.connect(self.teacher_view.uppdate)
-        self.main_menu.teacher_delete.triggered.connect(self.teacher_view.delete)
+        self.main_menu.teacher_mode_request.connect(self.teacher_mode_on)
 
-        # ===== STUDENT MENU CONNECTIONS (COMMENTED OUT) / ПОДКЛЮЧЕНИЯ МЕНЮ УЧЕНИКА (ЗАКОММЕНТИРОВАНО) =====
-        # Uncomment when switching to Student view / Раскомментировать при переключении на представление Student
-        # self.main_menu.student_add.triggered.connect(self.student_view.add)
-        # self.main_menu.student_update.triggered.connect(self.student_view.uppdate)
-        # self.main_menu.student_delete.triggered.connect(self.student_view.delete)
+        # ===== STUDENT MENU CONNECTIONS / ПОДКЛЮЧЕНИЯ МЕНЮ УЧЕНИКА =====
+        self.main_menu.student_mode_request.connect(self.student_mode_on)
 
-        # ===== GROUP MENU CONNECTIONS (COMMENTED OUT) / ПОДКЛЮЧЕНИЯ МЕНЮ ГРУППЫ (ЗАКОММЕНТИРОВАНО) =====
-        # Uncomment when switching to Group view / Раскомментировать при переключении на представление Group
-        # self.main_menu.st_group_add.triggered.connect(self.st_group_view.add)
-        # self.main_menu.st_group_update.triggered.connect(self.st_group_view.uppdate)
-        # self.main_menu.st_group_delete.triggered.connect(self.st_group_view.delete)
+        # ===== GROUP MENU CONNECTIONS / ПОДКЛЮЧЕНИЯ МЕНЮ ГРУППЫ =====
+        self.main_menu.st_group_mode_request.connect(self.st_group_mode_on)
 
         # ===== HELP MENU CONNECTIONS / ПОДКЛЮЧЕНИЯ МЕНЮ ПОМОЩИ =====
         # Connect Help menu actions to information dialogs / Подключение действий меню помощи к информационным диалогам
@@ -217,46 +176,32 @@ class MainWindow(QMainWindow):
         QMessageBox.aboutQt(self, "About Qt")
         self.lg.debug("About Qt dialog shown.")
 
-    # ===== PUBLIC METHODS - UTILITY FUNCTIONS / ПУБЛИЧНЫЕ МЕТОДЫ - УТИЛИТАРНЫЕ ФУНКЦИИ =====
+    @pyqtSlot()
+    def teacher_mode_on(self) -> None:
+        old = self.centralWidget()
+        v = Teacher.View(parent=self)
+        self.setCentralWidget(v)
+        self.menuBar().set_mode_teacher(v)
+        if old is not None:
+            old.deleteLater()
 
-    def switch_to_teacher_view(self) -> None:
-        """
-        Switch central widget to Teacher view / Переключить центральный виджет на представление Teacher
+    @pyqtSlot()
+    def student_mode_on(self) -> None:
+        old = self.centralWidget()
+        v = Student.View(parent=self)
+        self.setCentralWidget(v)
+        self.menuBar().set_mode_student(v)
+        if old is not None:
+            old.deleteLater()
 
-        Dynamically changes the central widget to display Teacher management interface.
-        Updates menu connections to work with the new view.
-
-        Динамически изменяет центральный виджет для отображения интерфейса управления Teacher.
-        Обновляет подключения меню для работы с новым представлением.
-        """
-        # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
-        self.lg.info("Switching to Teacher view requested.")
-
-    def switch_to_student_view(self) -> None:
-        """
-        Switch central widget to Student view / Переключить центральный виджет на представление Student
-
-        Dynamically changes the central widget to display Student management interface.
-        Updates menu connections to work with the new view.
-
-        Динамически изменяет центральный виджет для отображения интерфейса управления Student.
-        Обновляет подключения меню для работы с новым представлением.
-        """
-        # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
-        self.lg.info("Switching to Student view requested.")
-
-    def switch_to_group_view(self) -> None:
-        """
-        Switch central widget to Group view / Переключить центральный виджет на представление Group
-
-        Dynamically changes the central widget to display Group management interface.
-        Updates menu connections to work with the new view.
-
-        Динамически изменяет центральный виджет для отображения интерфейса управления Group.
-        Обновляет подключения меню для работы с новым представлением.
-        """
-        # TODO: Implement dynamic view switching / TODO: Реализовать динамическое переключение представлений
-        self.lg.info("Switching to Group view requested.")
+    @pyqtSlot()
+    def st_group_mode_on(self) -> None:
+        old = self.centralWidget()
+        v = StGroup.View(parent=self)
+        self.setCentralWidget(v)
+        self.menuBar().set_mode_st_group(v)
+        if old is not None:
+            old.deleteLater()
 
 
 # ===== MAIN EXECUTION BLOCK - FOR TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ДЛЯ ТЕСТИРОВАНИЯ =====

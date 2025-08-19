@@ -64,7 +64,7 @@ class View(BaseView):
         # Инициализация базового представления с моделью группы и растяжением колонки комментариев
         super().__init__(
             model_class=Model,
-            index_last_stretch_colum=1,  # Comment column index for stretching / Индекс колонки комментариев для растяжения
+            index_last_stretch_colum=2,  # Comment column index for stretching / Индекс колонки комментариев для растяжения
             parent=parent
         )
 

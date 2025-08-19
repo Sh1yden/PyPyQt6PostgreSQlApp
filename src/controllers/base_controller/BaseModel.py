@@ -224,7 +224,7 @@ class BaseModel(QStandardItemModel):
             self.lg.error(f"Internal error: {e}.")
             return Qt.ItemFlag.NoItemFlags
 
-    def setData(self, index, value, role=Qt.ItemDataRole.EditRole) -> bool:
+    def setData(self, index: QModelIndex, value: Any, role: int = Qt.ItemDataRole.EditRole) -> bool:
         """
         Handle cell data changes / Обработка изменения данных в ячейке
 
@@ -253,10 +253,8 @@ class BaseModel(QStandardItemModel):
             new_value = str(value).strip()
             column_name = self.column_names[index.column()]
 
-            # TODO: Add data validation / TODO добавить валидацию данных
-            # ! Data validation placeholder / ! Заглушка валидации данных
-            # if not self._validate_data(column_name, new_value):
-            #     return False
+            if not self._validate_data(column_name, new_value):
+                return False
 
             # Get record ID from first column / Получаем ID записи (первая колонка)
             id_item = self.item(index.row(), 0)
@@ -292,4 +290,29 @@ class BaseModel(QStandardItemModel):
             self.lg.critical(f"Internal error: {e}.")
             # Show user-friendly error message / Показать удобное для пользователя сообщение об ошибке
             QMessageBox.warning(None, "Update error", f"Record could not be updated: {str(e)}")
+            return False
+
+    def _validate_data(self, column_name: str, value: str) -> bool:
+        """
+        Базовая валидация данных
+        Переопределяется в наследниках для специфичной валидации
+
+        Args:
+            column_name: Имя колонки
+            value: Значение для валидации
+
+        Returns:
+            bool: True если валидация прошла успешно
+        """
+        try:
+            # Проверка на пустоту нового значения колонки, для обязательно заполненных полей
+            if not value and column_name in ["f_fio", "f_title"]:
+                self.lg.debug(f"Input FIO or Title in field {column_name}, this is necessary!")
+                QMessageBox.warning(None, "Input necessary fields!!!", f"Field {column_name} necessary to input!!!")
+                return False
+
+            self.lg.debug("Validation success.")
+            return True
+        except Exception as e:
+            self.lg.critical(f"Internal error: {e}.")
             return False
