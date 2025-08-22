@@ -43,6 +43,17 @@ class BaseDialog(QDialog):
         """
         super().__init__(parent)
 
+        self._FIELD_MAP = {
+            "fio": {"label": "Surname N. P.", "widget": QLineEdit},
+            "title": {"label": "Title Group", "widget": QLineEdit},
+            "phone": {"label": "Phone number", "widget": QLineEdit},
+            "email": {"label": "Email", "widget": QLineEdit},
+            "comment": {"label": "Comment", "widget": QTextEdit},
+            "username": {"label": "Username", "widget": QLineEdit},
+            "password": {"label": "Password", "widget": QLineEdit},
+        }
+        self._fields = {}
+
         # ===== LOGGER INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ЛОГЕРА =====
         self.lg = Logger()
         self.lg.debug("Constructor launched.")
@@ -79,45 +90,20 @@ class BaseDialog(QDialog):
 
         # ===== DYNAMIC FIELD CREATION / ДИНАМИЧЕСКОЕ СОЗДАНИЕ ПОЛЕЙ =====
         
-        # ===== FIO FIELD (Full Name) / ПОЛЕ ФИО (Полное имя) =====
-        if "fio" in privilege:
-            fio_lbl = QLabel("Surname N. P.", parent=self)  # Full name label / Метка полного имени
-            self.__fio_edit = QLineEdit(parent=self)  # Text input for name / Текстовый ввод для имени
+        for field in privilege:
+            cfg = self._FIELD_MAP.get(field)
+            if not cfg:
+                continue
 
-            lay.addWidget(fio_lbl)
-            lay.addWidget(self.__fio_edit)
+            lbl = QLabel(cfg["label"], parent=self)
+            widget = cfg["widget"](parent=self)
 
-        # ===== TITLE FIELD (Group Title) / ПОЛЕ ЗАГОЛОВКА (Название группы) =====
-        if "title" in privilege:
-            title_lbl = QLabel("Title Group", parent=self)  # Group title label / Метка названия группы
-            self.__fio_edit = QLineEdit(parent=self)  # Reusing fio_edit for title / Повторное использование fio_edit для заголовка
+            if field == "password" and isinstance(widget, QLineEdit):
+                widget.setEchoMode(QLineEdit.EchoMode.Password)
 
-            lay.addWidget(title_lbl)
-            lay.addWidget(self.__fio_edit)
-
-        # ===== PHONE FIELD / ПОЛЕ ТЕЛЕФОНА =====
-        if "phone" in privilege:
-            phone_lbl = QLabel("Phone number", parent=self)  # Phone label / Метка телефона
-            self.__phone_edit = QLineEdit(parent=self)  # Text input for phone / Текстовый ввод для телефона
-
-            lay.addWidget(phone_lbl)
-            lay.addWidget(self.__phone_edit)
-
-        # ===== EMAIL FIELD / ПОЛЕ EMAIL =====
-        if "email" in privilege:
-            email_lbl = QLabel("Email", parent=self)  # Email label / Метка email
-            self.__email_edit = QLineEdit(parent=self)  # Text input for email / Текстовый ввод для email
-
-            lay.addWidget(email_lbl)
-            lay.addWidget(self.__email_edit)
-
-        # ===== COMMENT FIELD / ПОЛЕ КОММЕНТАРИЯ =====
-        if "comment" in privilege:
-            comment_lbl = QLabel("Comment", parent=self)  # Comment label / Метка комментария
-            self.__comment_edit = QTextEdit(parent=self)  # Multi-line text input for comments / Многострочный ввод для комментариев
-
-            lay.addWidget(comment_lbl)
-            lay.addWidget(self.__comment_edit)
+            lay.addWidget(lbl)
+            lay.addWidget(widget)
+            self._fields[field] = widget
 
         # ===== BUTTON SETUP / НАСТРОЙКА КНОПОК =====
         ok_btn = QPushButton("OK", parent=self)  # Confirm button / Кнопка подтверждения
@@ -133,122 +119,57 @@ class BaseDialog(QDialog):
         ok_btn.clicked.connect(self.finish)  # Connect OK button to finish method / Подключить кнопку OK к методу finish
         cancel_btn.clicked.connect(self.reject)  # Connect Cancel button to reject method / Подключить кнопку Cancel к методу reject
 
+    def get_value(self, field: str) -> str | None:
+        """
+        Get input value for the given field.
+        Получить введённое значение для указанного поля.
+
+        Args:
+            field (str): Field name / Имя поля
+
+        Returns:
+            str | None: Cleaned input value or None if empty
+                        Очищенное введённое значение или None, если пустое
+        """
+        widget = self._fields.get(field)
+        if widget is None:
+            return None
+
+        if isinstance(widget, QLineEdit):
+            value = widget.text().strip()
+        elif isinstance(widget, QTextEdit):
+            value = widget.toPlainText().strip()
+        else:
+            return None
+
+        return value or None
+
     # ===== SLOT METHODS - EVENT HANDLERS / МЕТОДЫ-СЛОТЫ - ОБРАБОТЧИКИ СОБЫТИЙ =====
-    
+
     @pyqtSlot()
     def finish(self) -> None:
         """
         Dialog completion handler / Обработчик завершения диалога
-        
+
         Validates required fields before accepting the dialog.
         Shows error messages if validation fails.
         Accepts the dialog if all required data is provided.
-        
+
         Проверяет обязательные поля перед принятием диалога.
         Показывает сообщения об ошибках, если валидация не пройдена.
         Принимает диалог, если все необходимые данные предоставлены.
         """
         # ===== REQUIRED FIELD VALIDATION / ВАЛИДАЦИЯ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ =====
-        if self.fio is None:
+        if self.get_value("fio") is None:
             self.lg.debug("No FIO input provided.")
             QMessageBox.information(self,
                                     "Please input Surname N.P!!!",
                                     "Please input Surname N.P!!! This is necessary.")
             return
-            
+
         # ===== DIALOG ACCEPTANCE / ПРИНЯТИЕ ДИАЛОГА =====
         self.accept()  # Close dialog with acceptance / Закрыть диалог с принятием
         self.lg.debug("Dialog accepted successfully.")
-
-    # ===== PROPERTY METHODS - DATA ACCESS / МЕТОДЫ-СВОЙСТВА - ДОСТУП К ДАННЫМ =====
-    
-    @property
-    def fio(self) -> str | None:
-        """
-        Get FIO (Full Name) input value / Получение значения ввода ФИО (Полное имя)
-        
-        Returns the cleaned FIO input or None if empty.
-        Performs basic validation and logging.
-        
-        Возвращает очищенный ввод ФИО или None, если пустой.
-        Выполняет базовую валидацию и логирование.
-        
-        Returns:
-            str or None: Cleaned FIO string or None if empty / Очищенная строка ФИО или None если пустая
-        """
-        result = self.__fio_edit.text().strip()
-        if result == "":
-            return None
-        else:
-            self.lg.debug("FIO input successful.")
-            return result
-
-    @property
-    def phone(self) -> str | None:
-        """
-        Get phone input value / Получение значения ввода телефона
-        
-        Returns the cleaned phone input or None if empty.
-        Performs basic validation and logging.
-        
-        Возвращает очищенный ввод телефона или None, если пустой.
-        Выполняет базовую валидацию и логирование.
-        
-        Returns:
-            str or None: Cleaned phone string or None if empty / Очищенная строка телефона или None если пустая
-        """
-        result = self.__phone_edit.text().strip()
-        if result == "":
-            self.lg.debug("No phone input provided.")
-            return None
-        else:
-            self.lg.debug("Phone input successful.")
-            return result
-
-    @property
-    def email(self) -> str | None:
-        """
-        Get email input value / Получение значения ввода email
-        
-        Returns the cleaned email input or None if empty.
-        Could be extended with email format validation.
-        
-        Возвращает очищенный ввод email или None, если пустой.
-        Может быть расширен валидацией формата email.
-        
-        Returns:
-            str or None: Cleaned email string or None if empty / Очищенная строка email или None если пустая
-        """
-        result = self.__email_edit.text().strip()
-        if result == "":
-            self.lg.debug("No email input provided.")
-            return None
-        else:
-            self.lg.debug("Email input successful.")
-            return result
-
-    @property
-    def comment(self) -> str | None:
-        """
-        Get comment input value / Получение значения ввода комментария
-        
-        Returns the cleaned comment input or None if empty.
-        Handles multi-line text input from QTextEdit.
-        
-        Возвращает очищенный ввод комментария или None, если пустой.
-        Обрабатывает многострочный текстовый ввод из QTextEdit.
-        
-        Returns:
-            str or None: Cleaned comment string or None if empty / Очищенная строка комментария или None если пустая
-        """
-        result = self.__comment_edit.toPlainText().strip()
-        if result == "":
-            self.lg.debug("No comment input provided.")
-            return None
-        else:
-            self.lg.debug("Comment input successful.")
-            return result
-
 
 # ===== MAIN EXECUTION BLOCK - FOR TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ДЛЯ ТЕСТИРОВАНИЯ =====
 if __name__ == '__main__':

@@ -83,8 +83,8 @@ class View(BaseView):
         if dialog.exec():
             # Add new group with dialog data / Добавление новой группы с данными из диалога
             self.model().add(
-                dialog.fio,      # Group title / Название группы
-                dialog.comment   # Additional comments / Дополнительные комментарии
+                dialog.get_value("fio"),      # Group title / Название группы
+                dialog.get_value("comment")   # Additional comments / Дополнительные комментарии
             )
 
 

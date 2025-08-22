@@ -149,6 +149,10 @@ class BaseModel(QStandardItemModel):
             bool: True if successful, False otherwise / True при успехе, False в противном случае
         """
         try:
+            self.lg.debug(f"Add method received args: {args}")
+            self.lg.debug(f"Table columns: {self.column_names}")
+            self.lg.debug(f"Insert query: {self.queries['insert']}")
+
             # Establish connection and execute INSERT query / Установка соединения и выполнение INSERT запроса
             self.condb.connect_to_db()
             self.condb.execute_query(self.queries["insert"], args)

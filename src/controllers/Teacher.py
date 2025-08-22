@@ -83,10 +83,10 @@ class View(BaseView):
         if dialog.exec():
             # Add new teacher with dialog data / Добавление нового учителя с данными из диалога
             self.model().add(
-                dialog.fio,      # Full name / Полное имя
-                dialog.phone,    # Phone number / Номер телефона
-                dialog.email,    # Email address / Email адрес
-                dialog.comment   # Additional comments / Дополнительные комментарии
+                dialog.get_value("fio"),      # Full name / Полное имя
+                dialog.get_value("phone"),    # Phone number / Номер телефона
+                dialog.get_value("email"),    # Email address / Email адрес
+                dialog.get_value("comment")   # Additional comments / Дополнительные комментарии
             )
 
 
