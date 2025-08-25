@@ -7,6 +7,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 
 # ===== CONFIGURATION CLASS / КЛАСС КОНФИГУРАЦИИ =====
@@ -24,7 +25,9 @@ class AppConfig:
 
     # ===== SINGLETON PATTERN IMPLEMENTATION / РЕАЛИЗАЦИЯ ПАТТЕРНА СИНГЛТОН =====
     _instanse_AppCfg = None  # Stores single instance / Хранит единственный экземпляр
-    _initialized_AppCfg = False  # Single initialization flag / Флаг на единственную инициализацию
+    _initialized_AppCfg = (
+        False  # Single initialization flag / Флаг на единственную инициализацию
+    )
 
     # ===== SINGLETON CREATION METHOD / МЕТОД СОЗДАНИЯ СИНГЛТОНА =====
     def __new__(cls):
@@ -79,13 +82,13 @@ class AppConfig:
             self._SAVE_SET_LG_FILE = Path(f"{self._SAVE_SET_DIR}/lg_settings.json")
             # Default log settings dictionary / Словарь настроек логов по умолчанию
             self._LG_DEF_SET = {
-                "lg_lvl_set": 0,    # Default logging level / Уровень логирования по умолчанию
-                "OFF": 0,           # Logging disabled / Логирование отключено
-                "DEBUG": 10,        # Debug level / Уровень отладки
-                "INFO": 20,         # Information level / Информационный уровень
-                "WARNING": 30,      # Warning level / Уровень предупреждений
-                "ERROR": 40,        # Error level / Уровень ошибок
-                "CRITICAL": 50      # Critical level / Критический уровень
+                "lg_lvl_set": 0,  # Default logging level / Уровень логирования по умолчанию
+                "OFF": 0,  # Logging disabled / Логирование отключено
+                "DEBUG": 10,  # Debug level / Уровень отладки
+                "INFO": 20,  # Information level / Информационный уровень
+                "WARNING": 30,  # Warning level / Уровень предупреждений
+                "ERROR": 40,  # Error level / Уровень ошибок
+                "CRITICAL": 50,  # Critical level / Критический уровень
             }
 
             # ===== DATABASE CONFIGURATION SETUP / НАСТРОЙКА КОНФИГУРАЦИИ БАЗЫ ДАННЫХ =====
@@ -93,11 +96,11 @@ class AppConfig:
             self._SAVE_SET_DB_FILE = Path(f"{self._SAVE_SET_DIR}/db_settings.json")
             # Default database connection settings / Настройки подключения к БД по умолчанию
             self._DB_DEF_SET = {
-                "host": "localhost",        # Database server host / Хост сервера базы данных
-                "dbname": "Shcool App",     # Database name / Имя базы данных
-                "port": 5432,               # Database port / Порт базы данных
-                "user": "postgres",         # Database user / Пользователь базы данных
-                "password": "345627"        # Database password / Пароль базы данных
+                "host": "localhost",  # Database server host / Хост сервера базы данных
+                "dbname": "Shcool App",  # Database name / Имя базы данных
+                "port": 5432,  # Database port / Порт базы данных
+                "user": "postgres",  # Database user / Пользователь базы данных
+                "password": "345627",  # Database password / Пароль базы данных
             }
 
             # ===== FILE AND DIRECTORY INITIALIZATION / ИНИЦИАЛИЗАЦИЯ ФАЙЛОВ И ДИРЕКТОРИЙ =====
@@ -107,12 +110,12 @@ class AppConfig:
             # Load all logging settings from file / Загрузка всех настроек логирования из файла
             self._LG_ALL_SET = self.load_from_file(self._SAVE_SET_LG_FILE)
             # Current logging level / Текущий уровень логирования
-            self._LG_LVL = self._LG_ALL_SET["lg_lvl_set"]
+            self._LG_LVL = self._LG_ALL_SET["lg_lvl_set"]  # type: ignore # !
 
     # ===== PROPERTY METHODS - LOGGING CONFIGURATION / МЕТОДЫ-СВОЙСТВА - КОНФИГУРАЦИЯ ЛОГИРОВАНИЯ =====
 
     @property
-    def save_lg_dir(self) -> Path | None:
+    def save_lg_dir(self) -> Path:
         """
         Get log directory path / Получить путь к папке логов
 
@@ -132,7 +135,7 @@ class AppConfig:
         return self._SAVE_SET_LG_FILE
 
     @property
-    def lg_all_set(self) -> dict | None:
+    def lg_all_set(self) -> Any:
         """
         Get all log settings / Получить все настройки логов
 
@@ -154,7 +157,7 @@ class AppConfig:
     # ===== PROPERTY METHODS - DATABASE CONFIGURATION / МЕТОДЫ-СВОЙСТВА - КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ =====
 
     @property
-    def save_set_db_file(self) -> Path | None:
+    def save_set_db_file(self) -> Path:
         """
         Get database settings file path / Получить путь к файлу настроек БД
 
@@ -198,7 +201,7 @@ class AppConfig:
 
     # ===== PUBLIC METHODS - FILE OPERATIONS / ПУБЛИЧНЫЕ МЕТОДЫ - ОПЕРАЦИИ С ФАЙЛАМИ =====
 
-    def load_from_file(self, file_path: Path, mode="r") -> dict | None:
+    def load_from_file(self, file_path: Path, mode="r") -> Any | None:
         """
         Load data from JSON file and return its contents / Загрузка данных из JSON файла и возврат его содержания
 
@@ -215,7 +218,9 @@ class AppConfig:
             # Set error flag and return None on failure / Установка флага ошибки и возврат None при неудаче
             self._internal_error_occurred = True
 
-    def save_to_file(self, file_path: Path,  var: dict,  jsonl: bool = False, mode: str="w") -> None:
+    def save_to_file(
+        self, file_path: Path, var: dict, jsonl: bool = False, mode: str = "w"
+    ) -> Any | None:
         """
         Save value to JSON file / Сохранение значения в JSON файл
         And Save value to JSONL file / Сохранение значения в JSONL файл
@@ -241,7 +246,7 @@ class AppConfig:
 
 
 # ===== MAIN EXECUTION BLOCK / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ =====
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Test configuration creation / Тестирование создания конфигурации
     # This block is used for testing the AppConfig class functionality
     # Этот блок используется для тестирования функциональности класса AppConfig

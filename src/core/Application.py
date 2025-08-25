@@ -3,7 +3,7 @@
 # ===== IMPORTS / ИМПОРТЫ =====
 # PyQt6 core imports for application framework /
 # Импорты PyQt6 для фреймворка приложения
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication  # type: ignore
 
 # Local logging system import / Импорт локальной системы логирования
 from src.core.Logger import Logger

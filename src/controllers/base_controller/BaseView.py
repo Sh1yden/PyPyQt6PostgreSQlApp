@@ -14,27 +14,32 @@ class BaseView(QTableView):
     """
     Base view class for displaying data / Базовый класс представления для отображения данных
     Handles user interface and interactions / Обрабатывает пользовательский интерфейс и взаимодействия
-    
+
     This class provides a unified table view interface for all database entities.
     It handles data display, user interactions, keyboard shortcuts, and CRUD operations.
     Extends QTableView with enhanced functionality for database management.
-    
+
     Этот класс предоставляет унифицированный интерфейс представления таблицы для всех сущностей базы данных.
     Он обрабатывает отображение данных, взаимодействия с пользователем, горячие клавиши и операции CRUD.
     Расширяет QTableView с улучшенной функциональностью для управления базой данных.
     """
 
     # ===== INITIALIZATION METHOD / МЕТОД ИНИЦИАЛИЗАЦИИ =====
-    def __init__(self, model_class: type, index_last_stretch_colum: int | None = None, parent=None):
+    def __init__(
+        self,
+        model_class: type,
+        index_last_stretch_colum: int | None = None,
+        parent=None,
+    ):
         """
         Initialize base view with model configuration / Инициализация базового представления с конфигурацией модели
-        
+
         Sets up the table view with the specified model class and configures display properties.
         Establishes keyboard shortcuts and connects signals for data updates.
-        
+
         Настраивает представление таблицы с указанным классом модели и конфигурирует свойства отображения.
         Устанавливает горячие клавиши и подключает сигналы для обновления данных.
-        
+
         Args:
             model_class: Model class for this view / Класс модели для данного представления
             index_last_stretch_colum: Index of column to stretch to fill remaining space / Индекс колонки для растягивания на оставшееся пространство
@@ -66,27 +71,28 @@ class BaseView(QTableView):
         self.lg.debug("Setup shortcuts and view completed successfully.")
 
     # ===== PRIVATE METHODS - UI SETUP / ПРИВАТНЫЕ МЕТОДЫ - НАСТРОЙКА UI =====
-    
+
     def setup_table_view(self) -> None:
         """
         Table appearance configuration / Настройка внешнего вида таблицы
-        
+
         Configures table display properties including column sizing, selection behavior,
         editing triggers, sorting, and visual enhancements for better user experience.
-        
+
         Настраивает свойства отображения таблицы, включая размеры колонок, поведение выбора,
         триггеры редактирования, сортировку и визуальные улучшения для лучшего пользовательского опыта.
         """
         try:
             # ===== COLUMN SIZING / РАЗМЕРЫ КОЛОНОК =====
             # Resize columns to content by default / Изменение размера колонок под содержимое по умолчанию
-            self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+            self.horizontalHeader().setSectionResizeMode(
+                QHeaderView.ResizeMode.ResizeToContents
+            )
 
             # Stretch specified column to fill remaining space / Растягивание указанной колонки для заполнения оставшегося пространства
             if self.index_stretch is not None:
                 self.horizontalHeader().setSectionResizeMode(
-                    self.index_stretch,
-                    QHeaderView.ResizeMode.Stretch
+                    self.index_stretch, QHeaderView.ResizeMode.Stretch
                 )
 
             # ===== SELECTION AND EDITING BEHAVIOR / ПОВЕДЕНИЕ ВЫБОРА И РЕДАКТИРОВАНИЯ =====
@@ -115,12 +121,12 @@ class BaseView(QTableView):
     def setup_shortcuts(self) -> None:
         """
         Keyboard shortcuts configuration / Настройка горячих клавиш
-        
+
         Establishes keyboard shortcuts for common operations:
         - Delete: Remove single selected record
-        - Ctrl+Delete: Remove multiple selected records  
+        - Ctrl+Delete: Remove multiple selected records
         - Ctrl+A: Select all records
-        
+
         Устанавливает горячие клавиши для общих операций:
         - Delete: Удаление одной выбранной записи
         - Ctrl+Delete: Удаление нескольких выбранных записей
@@ -151,49 +157,55 @@ class BaseView(QTableView):
             self.lg.error(f"Internal error: {e}.")
 
     # ===== PUBLIC METHODS - CRUD OPERATIONS / ПУБЛИЧНЫЕ МЕТОДЫ - ОПЕРАЦИИ CRUD =====
-    
+
     def add(self) -> None:
         """
         Add new record operation / Операция добавления новой записи
-        
+
         This method should be overridden in child classes to provide entity-specific
         dialog creation and data input functionality.
-        
+
         Этот метод должен быть переопределен в дочерних классах для предоставления
         специфичной для сущности функциональности создания диалогов и ввода данных.
         """
-        QMessageBox.information(self, "Information",
-                              "The add() method must be redefined in the inheritor")
-        self.lg.warning("BaseView add() method called but not implemented in child class")
+        QMessageBox.information(
+            self, "Information", "The add() method must be redefined in the inheritor"
+        )
+        self.lg.warning(
+            "BaseView add() method called but not implemented in child class"
+        )
 
     def uppdate(self) -> None:
         """
         Show information about direct table editing / Информация о редактировании напрямую в таблице
-        
+
         Displays user instructions for editing records directly in the table view
         and available keyboard shortcuts for various operations.
-        
+
         Отображает пользовательские инструкции для редактирования записей напрямую в представлении таблицы
         и доступные горячие клавиши для различных операций.
         """
-        QMessageBox.information(self, "Edit",
-                                "For editing:\n"
-                                "• Double-click on the cell\n"
-                                "• Record ID cannot be edited\n\n"
-                                "Keyboard shortcuts:\n"
-                                "• F5 - update data\n"
-                                "• Delete - delete selected record\n"
-                                "• Ctrl+Delete - delete selected records\n"
-                                "• Ctrl+A - select all")
+        QMessageBox.information(
+            self,
+            "Edit",
+            "For editing:\n"
+            "• Double-click on the cell\n"
+            "• Record ID cannot be edited\n\n"
+            "Keyboard shortcuts:\n"
+            "• F5 - update data\n"
+            "• Delete - delete selected record\n"
+            "• Ctrl+Delete - delete selected records\n"
+            "• Ctrl+A - select all",
+        )
 
     def delete(self) -> None:
         """
         Delete single selected record / Удаление выбранной записи
-        
+
         Prompts user for confirmation before deleting the selected record.
         Shows detailed information about the record being deleted.
         Updates the view automatically after successful deletion.
-        
+
         Запрашивает подтверждение пользователя перед удалением выбранной записи.
         Показывает подробную информацию о удаляемой записи.
         Автоматически обновляет представление после успешного удаления.
@@ -203,8 +215,7 @@ class BaseView(QTableView):
             selection = self.selectionModel().selectedRows()
 
             if not selection:
-                QMessageBox.information(self, "Delete",
-                                        "Select an entry to delete")
+                QMessageBox.information(self, "Delete", "Select an entry to delete")
                 return
 
             # ===== RECORD DATA EXTRACTION / ИЗВЛЕЧЕНИЕ ДАННЫХ ЗАПИСИ =====
@@ -213,14 +224,15 @@ class BaseView(QTableView):
             # Get record ID from first column / Получаем ID записи (первая колонка)
             id_item = self.model().item(selected_row, 0)
             if not id_item:
-                QMessageBox.warning(self, "Error",
-                                    "Record ID could not be retrieved")
+                QMessageBox.warning(self, "Error", "Record ID could not be retrieved")
                 return
 
             record_id = id_item.text()
 
             # Get main field for confirmation dialog / Получаем основное поле для диалога подтверждения
-            main_field_item = self.model().item(selected_row, 1)  # Second column / Вторая колонка
+            main_field_item = self.model().item(
+                selected_row, 1
+            )  # Second column / Вторая колонка
             main_field_value = main_field_item.text() if main_field_item else "Unknown"
 
             # ===== CONFIRMATION DIALOG / ДИАЛОГ ПОДТВЕРЖДЕНИЯ =====
@@ -232,30 +244,36 @@ class BaseView(QTableView):
                 f"Name: {main_field_value}\n\n"
                 f"This action cannot be undone!",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No
+                QMessageBox.StandardButton.No,
             )
 
             # ===== DELETION EXECUTION / ВЫПОЛНЕНИЕ УДАЛЕНИЯ =====
             if reply == QMessageBox.StandardButton.Yes:
                 if self.model().delete_record(record_id):
-                    QMessageBox.information(self, "Deletion",
-                                          f"Record '{main_field_value}' successfully deleted")
+                    QMessageBox.information(
+                        self,
+                        "Deletion",
+                        f"Record '{main_field_value}' successfully deleted",
+                    )
                     self.lg.debug(f"BaseView Successfully deleted record {record_id}")
                 else:
-                    QMessageBox.critical(self, "Error",
-                                       "The record could not be deleted.\n"
-                                       "Check the log for details.")
+                    QMessageBox.critical(
+                        self,
+                        "Error",
+                        "The record could not be deleted.\n"
+                        "Check the log for details.",
+                    )
         except Exception as e:
             self.lg.error(f"BaseView internal error: {e}. In DEF delete().")
 
     def delete_selected(self) -> None:
         """
         Delete all selected records / Удаление всех выбранных записей
-        
+
         Allows bulk deletion of multiple selected records with confirmation.
         Provides detailed feedback on the number of successfully and unsuccessfully deleted records.
         Processes deletions in reverse order to maintain index consistency.
-        
+
         Позволяет массовое удаление нескольких выбранных записей с подтверждением.
         Предоставляет подробную обратную связь о количестве успешно и неуспешно удаленных записей.
         Обрабатывает удаления в обратном порядке для поддержания согласованности индексов.
@@ -265,8 +283,7 @@ class BaseView(QTableView):
             selection = self.selectionModel().selectedRows()
 
             if not selection:
-                QMessageBox.information(self, "Delete",
-                                        "Select entries to delete")
+                QMessageBox.information(self, "Delete", "Select entries to delete")
                 return
 
             # ===== CONFIRMATION DIALOG / ДИАЛОГ ПОДТВЕРЖДЕНИЯ =====
@@ -277,7 +294,7 @@ class BaseView(QTableView):
                 f"Are you sure you want to delete {count} records?\n\n"
                 f"This action cannot be canceled!",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No
+                QMessageBox.StandardButton.No,
             )
 
             # ===== BULK DELETION EXECUTION / ВЫПОЛНЕНИЕ МАССОВОГО УДАЛЕНИЯ =====
@@ -287,7 +304,9 @@ class BaseView(QTableView):
 
                 # Sort indices in descending order to prevent index shifting during deletion
                 # Сортируем индексы по убыванию, чтобы удаление не сбивало нумерацию
-                sorted_selection = sorted(selection, key=lambda x: x.row(), reverse=True)
+                sorted_selection = sorted(
+                    selection, key=lambda x: x.row(), reverse=True
+                )
 
                 for index in sorted_selection:
                     row = index.row()
@@ -308,7 +327,9 @@ class BaseView(QTableView):
                 else:
                     QMessageBox.information(self, "Deletion result", message)
 
-                self.lg.debug(f"BaseView: Multiple delete - success: {deleted_count}, failed: {failed_count}")
+                self.lg.debug(
+                    f"BaseView: Multiple delete - success: {deleted_count}, failed: {failed_count}"
+                )
         except Exception as e:
             self.lg.error(f"BaseView delete_selected error: {e}")
 
@@ -317,10 +338,15 @@ class BaseView(QTableView):
         self.resizeColumnsToContents()
         self.setup_table_view()
 
+
 # ===== MAIN EXECUTION BLOCK - FOR TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ДЛЯ ТЕСТИРОВАНИЯ =====
-if __name__ == '__main__':
+if __name__ == "__main__":
     # This block can be used for testing BaseView functionality independently
     # Этот блок может использоваться для независимого тестирования функциональности BaseView
     print("=== BaseView Testing Mode / Режим тестирования BaseView ===")
-    print("BaseView is a base class and should be inherited by specific view implementations.")
-    print("BaseView является базовым классом и должен наследоваться конкретными реализациями представлений.")
+    print(
+        "BaseView is a base class and should be inherited by specific view implementations."
+    )
+    print(
+        "BaseView является базовым классом и должен наследоваться конкретными реализациями представлений."
+    )

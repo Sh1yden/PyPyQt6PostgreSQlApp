@@ -1,6 +1,7 @@
 # ===== MAIN MENU CLASS / КЛАСС ГЛАВНОГО МЕНЮ =====
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
 from PyQt6.QtGui import QActionGroup
+
 # ===== IMPORTS / ИМПОРТЫ =====
 # PyQt6 UI framework imports / Импорты фреймворка UI PyQt6
 from PyQt6.QtWidgets import QMenuBar
@@ -59,9 +60,15 @@ class MainMenu(QMenuBar):
         self.__teacher_menu_action = teacher_menu.menuAction()
 
         # Add CRUD operation actions / Добавление действий CRUD операций
-        self.__teacher_add = teacher_menu.addAction("Add")          # Add new teacher / Добавить нового учителя
-        self.__teacher_update = teacher_menu.addAction("Update")    # Update existing teacher / Обновить существующего учителя
-        self.__teacher_delete = teacher_menu.addAction("Delete")    # Delete selected teacher / Удалить выбранного учителя
+        self.__teacher_add = teacher_menu.addAction(
+            "Add"
+        )  # Add new teacher / Добавить нового учителя
+        self.__teacher_update = teacher_menu.addAction(
+            "Update"
+        )  # Update existing teacher / Обновить существующего учителя
+        self.__teacher_delete = teacher_menu.addAction(
+            "Delete"
+        )  # Delete selected teacher / Удалить выбранного учителя
 
         self.lg.debug("Teacher_menu add successfully.")
 
@@ -73,9 +80,15 @@ class MainMenu(QMenuBar):
         self.__student_menu_action = student_menu.menuAction()
 
         # Add CRUD operation actions / Добавление действий CRUD операций
-        self.__student_add = student_menu.addAction("Add")          # Add new student / Добавить нового студента
-        self.__student_update = student_menu.addAction("Update")    # Update existing student / Обновить существующего студента
-        self.__student_delete = student_menu.addAction("Delete")    # Delete selected student / Удалить выбранного студента
+        self.__student_add = student_menu.addAction(
+            "Add"
+        )  # Add new student / Добавить нового студента
+        self.__student_update = student_menu.addAction(
+            "Update"
+        )  # Update existing student / Обновить существующего студента
+        self.__student_delete = student_menu.addAction(
+            "Delete"
+        )  # Delete selected student / Удалить выбранного студента
 
         self.lg.debug("Student_menu add successfully.")
 
@@ -87,9 +100,15 @@ class MainMenu(QMenuBar):
         self.__st_group_menu_action = st_group_menu.menuAction()
 
         # Add CRUD operation actions / Добавление действий CRUD операций
-        self.__st_group_add = st_group_menu.addAction("Add")          # Add new group / Добавить новую группу
-        self.__st_group_update = st_group_menu.addAction("Update")    # Update existing group / Обновить существующую группу
-        self.__st_group_delete = st_group_menu.addAction("Delete")    # Delete selected group / Удалить выбранную группу
+        self.__st_group_add = st_group_menu.addAction(
+            "Add"
+        )  # Add new group / Добавить новую группу
+        self.__st_group_update = st_group_menu.addAction(
+            "Update"
+        )  # Update existing group / Обновить существующую группу
+        self.__st_group_delete = st_group_menu.addAction(
+            "Delete"
+        )  # Delete selected group / Удалить выбранную группу
 
         self.lg.debug("St_group_menu add successfully.")
 
@@ -119,8 +138,12 @@ class MainMenu(QMenuBar):
         help_menu = self.addMenu("Help")
 
         # Add information actions / Добавление информационных действий
-        self.__about = help_menu.addAction("About program...")    # Show program information / Показать информацию о программе
-        self.__about_qt = help_menu.addAction("About qt...")      # Show Qt framework information / Показать информацию о фреймворке Qt
+        self.__about = help_menu.addAction(
+            "About program..."
+        )  # Show program information / Показать информацию о программе
+        self.__about_qt = help_menu.addAction(
+            "About qt..."
+        )  # Show Qt framework information / Показать информацию о фреймворке Qt
 
         self.lg.debug("Help_menu add successfully.")
 

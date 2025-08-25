@@ -2,6 +2,7 @@
 # Automated SQL query generation for database operations
 # Автоматическая генерация SQL запросов для операций с базой данных
 
+
 # ===== BASE QUERY BUILDER CLASS / БАЗОВЫЙ КЛАСС КОНСТРУКТОРА ЗАПРОСОВ =====
 class QueryBuilder:
     """
@@ -95,9 +96,9 @@ class QueryBuilder:
             raise ValueError("Columns list cannot be empty")
 
         # Generate parameter placeholders / Генерация заполнителей параметров
-        placeholders = ', '.join(['%s'] * len(columns))
+        placeholders = ", ".join(["%s"] * len(columns))
         # Join column names / Соединение имен столбцов
-        columns_str = ', '.join(columns)
+        columns_str = ", ".join(columns)
         return f'INSERT INTO "{table_name}" ({columns_str}) VALUES ({placeholders})'
 
     # ===== UPDATE OPERATIONS / ОПЕРАЦИИ ОБНОВЛЕНИЯ =====
@@ -132,7 +133,7 @@ class QueryBuilder:
             raise ValueError("Columns list cannot be empty")
 
         # Generate SET clause with parameter placeholders / Генерация SET клаузулы с заполнителями параметров
-        set_clause = ', '.join([f'{col} = %s' for col in columns])
+        set_clause = ", ".join([f"{col} = %s" for col in columns])
         return f'UPDATE "{table_name}" SET {set_clause} WHERE id = %s'
 
     # ===== DELETE OPERATIONS / ОПЕРАЦИИ УДАЛЕНИЯ =====
@@ -254,7 +255,9 @@ class AdvancedQueryBuilder(QueryBuilder):
     # ===== SORTING OPERATIONS / ОПЕРАЦИИ СОРТИРОВКИ =====
 
     @staticmethod
-    def select_ordered_by(table_name: str, order_column: str, ascending: bool = True) -> str:
+    def select_ordered_by(
+        table_name: str, order_column: str, ascending: bool = True
+    ) -> str:
         """
         Generate query with custom ordering / Генерирует запрос с пользовательской сортировкой
 
@@ -325,11 +328,13 @@ class AdvancedQueryBuilder(QueryBuilder):
         Example:
             SELECT * FROM "Teacher" WHERE f_email IS NOT NULL ORDER BY id
         """
-        return f'SELECT * FROM "{table_name}" WHERE {column_name} IS NOT NULL ORDER BY id'
+        return (
+            f'SELECT * FROM "{table_name}" WHERE {column_name} IS NOT NULL ORDER BY id'
+        )
 
 
 # ===== MAIN EXECUTION BLOCK - TESTING AND EXAMPLES / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ТЕСТИРОВАНИЕ И ПРИМЕРЫ =====
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Testing query generator functionality / Тестирование функциональности генератора запросов
     print("=== QueryBuilder Testing / Тестирование QueryBuilder ===")
     print()
@@ -338,7 +343,7 @@ if __name__ == '__main__':
     print("=== Base QueryBuilder Tests / Тесты базового QueryBuilder ===")
 
     # Test data for Teacher table / Тестовые данные для таблицы Teacher
-    teacher_columns = ['f_fio', 'f_phone', 'f_email', 'f_comment']
+    teacher_columns = ["f_fio", "f_phone", "f_email", "f_comment"]
     print("Teacher table queries / Запросы для таблицы Teacher:")
     print(f"  SELECT ALL: {QueryBuilder.select_all('Teacher')}")
     print(f"  SELECT BY ID: {QueryBuilder.select_by_id('Teacher')}")
@@ -347,10 +352,10 @@ if __name__ == '__main__':
     print(f"  DELETE: {QueryBuilder.delete('Teacher')}")
     print(f"  COUNT: {QueryBuilder.count('Teacher')}")
 
-    print("\n" + "="*60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
     # Test data for Student table / Тестовые данные для таблицы Student
-    student_columns = ['f_fio', 'f_email', 'f_comment']
+    student_columns = ["f_fio", "f_email", "f_comment"]
     print("Student table queries / Запросы для таблицы Student:")
     print(f"  SELECT ALL: {QueryBuilder.select_all('Student')}")
     print(f"  SELECT BY ID: {QueryBuilder.select_by_id('Student')}")
@@ -359,10 +364,10 @@ if __name__ == '__main__':
     print(f"  DELETE: {QueryBuilder.delete('Student')}")
     print(f"  COUNT: {QueryBuilder.count('Student')}")
 
-    print("\n" + "="*60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
     # Test data for StGroup table / Тестовые данные для таблицы StGroup
-    group_columns = ['f_title', 'f_comment']
+    group_columns = ["f_title", "f_comment"]
     print("StGroup table queries / Запросы для таблицы StGroup:")
     print(f"  SELECT ALL: {QueryBuilder.select_all('StGroup')}")
     print(f"  SELECT BY ID: {QueryBuilder.select_by_id('StGroup')}")
@@ -371,40 +376,56 @@ if __name__ == '__main__':
     print(f"  DELETE: {QueryBuilder.delete('StGroup')}")
     print(f"  COUNT: {QueryBuilder.count('StGroup')}")
 
-    print("\n" + "="*60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
     # ===== ADVANCED QUERYBUILDER TESTS / ТЕСТЫ РАСШИРЕННОГО QUERYBUILDER =====
     print("=== Advanced QueryBuilder Tests / Тесты расширенного QueryBuilder ===")
 
-    print("Advanced queries for Teacher table / Расширенные запросы для таблицы Teacher:")
-    print(f"  SEARCH BY NAME: {AdvancedQueryBuilder.search_by_field('Teacher', 'f_fio')}")
-    print(f"  SEARCH BY EMAIL: {AdvancedQueryBuilder.search_by_field('Teacher', 'f_email')}")
-    print(f"  PAGINATION (10 records, skip 20): {AdvancedQueryBuilder.select_with_limit('Teacher', 10, 20)}")
-    print(f"  ORDER BY NAME ASC: {AdvancedQueryBuilder.select_ordered_by('Teacher', 'f_fio', True)}")
-    print(f"  ORDER BY NAME DESC: {AdvancedQueryBuilder.select_ordered_by('Teacher', 'f_fio', False)}")
-    print(f"  WHERE FIO EQUALS: {AdvancedQueryBuilder.select_where_equals('Teacher', 'f_fio')}")
-    print(f"  WHERE EMAIL NOT NULL: {AdvancedQueryBuilder.select_where_not_null('Teacher', 'f_email')}")
+    print(
+        "Advanced queries for Teacher table / Расширенные запросы для таблицы Teacher:"
+    )
+    print(
+        f"  SEARCH BY NAME: {AdvancedQueryBuilder.search_by_field('Teacher', 'f_fio')}"
+    )
+    print(
+        f"  SEARCH BY EMAIL: {AdvancedQueryBuilder.search_by_field('Teacher', 'f_email')}"
+    )
+    print(
+        f"  PAGINATION (10 records, skip 20): {AdvancedQueryBuilder.select_with_limit('Teacher', 10, 20)}"
+    )
+    print(
+        f"  ORDER BY NAME ASC: {AdvancedQueryBuilder.select_ordered_by('Teacher', 'f_fio', True)}"
+    )
+    print(
+        f"  ORDER BY NAME DESC: {AdvancedQueryBuilder.select_ordered_by('Teacher', 'f_fio', False)}"
+    )
+    print(
+        f"  WHERE FIO EQUALS: {AdvancedQueryBuilder.select_where_equals('Teacher', 'f_fio')}"
+    )
+    print(
+        f"  WHERE EMAIL NOT NULL: {AdvancedQueryBuilder.select_where_not_null('Teacher', 'f_email')}"
+    )
 
-    print("\n" + "="*60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
     # ===== ERROR HANDLING TESTS / ТЕСТЫ ОБРАБОТКИ ОШИБОК =====
     print("=== Error Handling Tests / Тесты обработки ошибок ===")
 
     try:
         # Test empty columns list / Тест пустого списка столбцов
-        QueryBuilder.insert('Teacher', [])
+        QueryBuilder.insert("Teacher", [])
         print("ERROR: Empty columns test should have failed!")
     except ValueError as e:
         print(f"✓ Empty columns validation working: {e}")
 
     try:
         # Test empty columns for update / Тест пустых столбцов для обновления
-        QueryBuilder.update('Teacher', [])
+        QueryBuilder.update("Teacher", [])
         print("ERROR: Empty columns update test should have failed!")
     except ValueError as e:
         print(f"✓ Empty columns update validation working: {e}")
 
-    print("\n" + "="*60 + "\n")
+    print("\n" + "=" * 60 + "\n")
 
     # ===== USAGE EXAMPLES / ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ =====
     print("=== Usage Examples / Примеры использования ===")

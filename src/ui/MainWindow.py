@@ -4,7 +4,9 @@
 
 # ===== IMPORTS / ИМПОРТЫ =====
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QStyle
-from PyQt6.QtCore import pyqtSlot  # Slot function responds to program actions / Slot функция реагирует на действие в программе
+from PyQt6.QtCore import (
+    pyqtSlot,
+)  # Slot function responds to program actions / Slot функция реагирует на действие в программе
 from PyQt6.QtGui import QIcon
 
 # ===== VIEW IMPORTS - ENTITY CONTROLLERS / ИМПОРТЫ ПРЕДСТАВЛЕНИЙ - КОНТРОЛЛЕРЫ СУЩНОСТЕЙ =====
@@ -88,7 +90,9 @@ class MainWindow(QMainWindow):
         self._icon = QIcon()
         if self._icon.isNull():
             # Use system default computer icon if custom icon not available / Использовать системную иконку компьютера, если пользовательская недоступна
-            self._icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+            self._icon = QIcon(
+                self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
+            )
         self.setWindowIcon(self._icon)
 
         self.lg.debug("Window properties configured successfully.")
@@ -106,7 +110,9 @@ class MainWindow(QMainWindow):
         # ===== MAIN MENU CREATION / СОЗДАНИЕ ГЛАВНОГО МЕНЮ =====
         # Parent=self sets parent window for main menu / Parent=self установка родительского окна для главного меню
         self.main_menu = MainMenu(parent=self)
-        self.setMenuBar(self.main_menu)  # Set main menu for window / установка главного меню для окна
+        self.setMenuBar(
+            self.main_menu
+        )  # Set main menu for window / установка главного меню для окна
 
         self.lg.debug("Menu system configured successfully.")
 
@@ -149,17 +155,20 @@ class MainWindow(QMainWindow):
         Отображает диалог "О программе" с информацией о приложении, включая версию,
         описание и используемый технологический стек.
         """
-        QMessageBox.about(self, "About program",
-                         "School management application\n"
-                         "Приложение для управления школой\n\n"
-                         "Version / Версия: 1.0\n"
-                         "Built with PyQt6 and PostgreSQL\n"
-                         "Создано с использованием PyQt6 и PostgreSQL\n\n"
-                         "Features / Возможности:\n"
-                         "• Teacher management / Управление учителями\n"
-                         "• Student management / Управление учениками\n"  
-                         "• Group management / Управление группами\n"
-                         "• Database integration / Интеграция с базой данных")
+        QMessageBox.about(
+            self,
+            "About program",
+            "School management application\n"
+            "Приложение для управления школой\n\n"
+            "Version / Версия: 1.0\n"
+            "Built with PyQt6 and PostgreSQL\n"
+            "Создано с использованием PyQt6 и PostgreSQL\n\n"
+            "Features / Возможности:\n"
+            "• Teacher management / Управление учителями\n"
+            "• Student management / Управление учениками\n"
+            "• Group management / Управление группами\n"
+            "• Database integration / Интеграция с базой данных",
+        )
         self.lg.debug("About program dialog shown.")
 
     @pyqtSlot()
@@ -205,7 +214,7 @@ class MainWindow(QMainWindow):
 
 
 # ===== MAIN EXECUTION BLOCK - FOR TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ДЛЯ ТЕСТИРОВАНИЯ =====
-if __name__ == '__main__':
+if __name__ == "__main__":
     # This block can be used for testing MainWindow functionality independently
     # Этот блок может использоваться для независимого тестирования функциональности MainWindow
     from PyQt6.QtWidgets import QApplication

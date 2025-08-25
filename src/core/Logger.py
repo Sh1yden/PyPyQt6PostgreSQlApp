@@ -28,7 +28,9 @@ class Logger:
 
     # ===== SINGLETON PATTERN IMPLEMENTATION / РЕАЛИЗАЦИЯ ПАТТЕРНА СИНГЛТОН =====
     _instanse_Logger = None  # Stores single instance / Хранит единственный экземпляр
-    _initialized_Logger = False  # Single initialization flag / Флаг на единственную инициализацию
+    _initialized_Logger = (
+        False  # Single initialization flag / Флаг на единственную инициализацию
+    )
 
     # ===== SINGLETON CREATION METHOD / МЕТОД СОЗДАНИЯ СИНГЛТОНА =====
     def __new__(cls):
@@ -106,7 +108,9 @@ class Logger:
 
             # If no files in directory, set name with 01 / Если файлов в директории нет, задаём имя с 01
             if len(logs_list) < 1:
-                save_file_name = Path(f"{self._appcfg.save_lg_dir}/{self._DATE}-{"01"}.jsonl")
+                save_file_name = Path(
+                    f"{self._appcfg.save_lg_dir}/{self._DATE}-{"01"}.jsonl"
+                )
             else:
                 # Otherwise give name + 1 from existing maximum in directory / Иначе выдаём имя + 1 от существующего максимального в директории
                 # Create list with sequential values 01, 02, etc. / Создание списка с последовательными значениями 01, 02 и т.д.
@@ -151,9 +155,11 @@ class Logger:
         caller_frame = stack[2].frame
 
         # Generate timestamp with millisecond precision / Генерация временной метки с точностью до миллисекунд
-        current_time = datetime.datetime.now().strftime('%H:%M:%S.%f')
+        current_time = datetime.datetime.now().strftime("%H:%M:%S.%f")
         file_name = Path(inspect.getfile(caller_frame)).name
-        module = inspect.getmodule(caller_frame).__name__
+        module = inspect.getmodule(
+            caller_frame
+        ).__name__  # pyright: ignore[reportOptionalMemberAccess]
         deff = caller_frame.f_code.co_name
         cls_obj = caller_frame.f_locals.get("self", None)
         cls_name = cls_obj.__class__.__name__ if cls_obj else None
@@ -165,7 +171,7 @@ class Logger:
             "module": module,
             "class": cls_name,
             "def": deff,
-            "message": message
+            "message": message,
         }
 
         # Protection from internal class errors and recursion / Защита от внутренних ошибок класса и рекурсии
@@ -176,7 +182,9 @@ class Logger:
         try:
             # Output to console for immediate feedback / Вывод в консоль для немедленной обратной связи
             print(self._DEF_STRUCTURE, file=sys.stderr)
-            self._appcfg.save_to_file(self._NAME_OF_LOG ,self._DEF_STRUCTURE, jsonl=True)
+            self._appcfg.save_to_file(
+                self._NAME_OF_LOG, self._DEF_STRUCTURE, jsonl=True  # type: ignore
+            )  # pyright: ignore[reportArgumentType]
         except Exception as e:
             # Set error flag and attempt fallback logging / Установка флага ошибки и попытка резервного логирования
             self._internal_error_occurred = True
@@ -271,7 +279,7 @@ class Logger:
 
 
 # ===== MAIN EXECUTION BLOCK - FUNCTIONALITY TESTING / БЛОК ГЛАВНОГО ВЫПОЛНЕНИЯ - ПРОВЕРКА РАБОТОСПОСОБНОСТИ =====
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Test logger functionality by creating instance and testing all log levels
     # Тестирование функциональности логгера путем создания экземпляра и проверки всех уровней логирования
     print("=== Logger Functionality Test / Тест функциональности логгера ===")

@@ -3,6 +3,7 @@
 # ===== IMPORTS / ИМПОРТЫ =====
 
 from typing import Any
+
 # PostgreSQL database adapter imports / Импорты адаптера базы данных PostgreSQL
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -49,7 +50,7 @@ class Connection:
         self.connection = None
 
     # ===== CONNECTION MANAGEMENT / УПРАВЛЕНИЕ СОЕДИНЕНИЯМИ =====
-    def connect_to_db(self) -> None:
+    def connect_to_db(self):
         """
         Establish connection to PostgreSQL database / Установление соединения с базой данных PostgreSQL
 
@@ -70,7 +71,7 @@ class Connection:
 
                 # Establish new connection with configuration parameters /
                 # Установление нового соединения с параметрами конфигурации
-                self.connection = psycopg2.connect(**db_config)
+                self.connection = psycopg2.connect(**db_config)  # type: ignore
 
                 self.lg.debug("Connected to DB.")
 
@@ -94,7 +95,9 @@ class Connection:
             # Проверка существования соединения перед попыткой закрытия
             if self.connection and not self.connection.closed:
                 self.connection.close()
-                self.connection = None  # Reset connection reference / Сброс ссылки на соединение
+                self.connection = (
+                    None  # Reset connection reference / Сброс ссылки на соединение
+                )
                 self.lg.debug("Connection CLOSED.")
 
         except Exception as e:
@@ -148,7 +151,7 @@ class Connection:
 
 
 # ===== FUNCTIONALITY TESTING / ПРОВЕРКА РАБОТОСПОСОБНОСТИ =====
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Test database connection functionality / Тестирование функциональности подключения к базе данных
     print("Testing database connection...")
 

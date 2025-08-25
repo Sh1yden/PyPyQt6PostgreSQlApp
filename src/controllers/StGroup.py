@@ -34,9 +34,7 @@ class Model(BaseModel):
         # Initialize base model with group-specific configuration /
         # Инициализация базовой модели с конфигурацией, специфичной для группы
         super().__init__(
-            table_name="StGroup",
-            columns=['f_title', 'f_comment'],
-            parent=parent
+            table_name="StGroup", columns=["f_title", "f_comment"], parent=parent
         )
 
 
@@ -65,7 +63,7 @@ class View(BaseView):
         super().__init__(
             model_class=Model,
             index_last_stretch_colum=2,  # Comment column index for stretching / Индекс колонки комментариев для растяжения
-            parent=parent
+            parent=parent,
         )
 
     # ===== CRUD OPERATIONS / ОПЕРАЦИИ CRUD =====
@@ -83,8 +81,10 @@ class View(BaseView):
         if dialog.exec():
             # Add new group with dialog data / Добавление новой группы с данными из диалога
             self.model().add(
-                dialog.get_value("fio"),      # Group title / Название группы
-                dialog.get_value("comment")   # Additional comments / Дополнительные комментарии
+                dialog.get_value("fio"),  # Group title / Название группы
+                dialog.get_value(
+                    "comment"
+                ),  # Additional comments / Дополнительные комментарии
             )
 
 
@@ -112,6 +112,9 @@ class Dialog(BaseDialog):
         # Инициализация базового диалога с полями, специфичными для группы
         super().__init__(
             window_title="StGroup",
-            fields=["title", "comment"],  # Required input fields / Обязательные поля ввода
-            parent=parent
+            fields=[
+                "title",
+                "comment",
+            ],  # Required input fields / Обязательные поля ввода
+            parent=parent,
         )

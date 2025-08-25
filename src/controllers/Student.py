@@ -35,8 +35,8 @@ class Model(BaseModel):
         # Инициализация базовой модели с конфигурацией, специфичной для студента
         super().__init__(
             table_name="Student",
-            columns=['f_fio', 'f_email', 'f_comment'],
-            parent=parent
+            columns=["f_fio", "f_email", "f_comment"],
+            parent=parent,
         )
 
 
@@ -65,7 +65,7 @@ class View(BaseView):
         super().__init__(
             model_class=Model,
             index_last_stretch_colum=3,  # Comment column index for stretching / Индекс колонки комментариев для растяжения
-            parent=parent
+            parent=parent,
         )
 
     # ===== CRUD OPERATIONS / ОПЕРАЦИИ CRUD =====
@@ -83,9 +83,11 @@ class View(BaseView):
         if dialog.exec():
             # Add new student with dialog data / Добавление нового студента с данными из диалога
             self.model().add(
-                dialog.get_value("fio"),      # Full name / Полное имя
-                dialog.get_value("email"),    # Email address / Email адрес
-                dialog.get_value("comment")   # Additional comments / Дополнительные комментарии
+                dialog.get_value("fio"),  # Full name / Полное имя
+                dialog.get_value("email"),  # Email address / Email адрес
+                dialog.get_value(
+                    "comment"
+                ),  # Additional comments / Дополнительные комментарии
             )
 
 
@@ -113,6 +115,10 @@ class Dialog(BaseDialog):
         # Инициализация базового диалога с полями, специфичными для студента
         super().__init__(
             window_title="Student",
-            fields=["fio", "email", "comment"],  # Required input fields / Обязательные поля ввода
-            parent=parent
+            fields=[
+                "fio",
+                "email",
+                "comment",
+            ],  # Required input fields / Обязательные поля ввода
+            parent=parent,
         )

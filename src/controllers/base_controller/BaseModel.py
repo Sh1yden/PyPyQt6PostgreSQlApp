@@ -58,15 +58,17 @@ class BaseModel(QStandardItemModel):
         # ===== CONFIGURATION STORAGE / СОХРАНЕНИЕ КОНФИГУРАЦИИ =====
         # Store table configuration for later use / Сохранение конфигурации таблицы для последующего использования
         self.table_name = table_name
-        self.column_names = []  # Will be populated when loading data / Будет заполнено при загрузке данных
+        self.column_names = (
+            []
+        )  # Will be populated when loading data / Будет заполнено при загрузке данных
 
         # ===== SQL QUERY GENERATION / ГЕНЕРАЦИЯ SQL ЗАПРОСОВ =====
         # Generate all necessary CRUD queries using QueryBuilder / Генерация всех необходимых CRUD запросов с использованием QueryBuilder
         self.queries = {
-            'select': QueryBuilder.select_all(table_name),
-            'insert': QueryBuilder.insert(table_name, columns),
-            'update': QueryBuilder.update(table_name, columns),
-            'delete': QueryBuilder.delete(table_name)
+            "select": QueryBuilder.select_all(table_name),
+            "insert": QueryBuilder.insert(table_name, columns),
+            "update": QueryBuilder.update(table_name, columns),
+            "delete": QueryBuilder.delete(table_name),
         }
 
         self.lg.debug(f"Generated queries for {table_name}.")
@@ -93,7 +95,7 @@ class BaseModel(QStandardItemModel):
         Автоматически обновляет пользовательский интерфейс после загрузки.
         """
         try:
-            rows = self.condb.execute_query(self.queries['select'])
+            rows = self.condb.execute_query(self.queries["select"])
 
             # Полная инициализация только при первом запуске
             if not self._initialized:
@@ -119,7 +121,9 @@ class BaseModel(QStandardItemModel):
                 for row_idx, row in enumerate(rows):
                     for col_idx, column_name in enumerate(columns):
                         cell_value = row[column_name]
-                        item = QStandardItem(str(cell_value) if cell_value is not None else "")
+                        item = QStandardItem(
+                            str(cell_value) if cell_value is not None else ""
+                        )
                         self.setItem(row_idx, col_idx, item)
 
             self.lg.debug("Refresh data successfully.")
@@ -223,12 +227,18 @@ class BaseModel(QStandardItemModel):
                 return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
             # Other columns can be edited / Остальные колонки можно редактировать
-            return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
+            return (
+                Qt.ItemFlag.ItemIsEnabled
+                | Qt.ItemFlag.ItemIsSelectable
+                | Qt.ItemFlag.ItemIsEditable
+            )
         except Exception as e:
             self.lg.error(f"Internal error: {e}.")
             return Qt.ItemFlag.NoItemFlags
 
-    def setData(self, index: QModelIndex, value: Any, role: int = Qt.ItemDataRole.EditRole) -> bool:
+    def setData(
+        self, index: QModelIndex, value: Any, role: int = Qt.ItemDataRole.EditRole
+    ) -> bool:
         """
         Handle cell data changes / Обработка изменения данных в ячейке
 
@@ -270,30 +280,38 @@ class BaseModel(QStandardItemModel):
 
             # Collect all row data for update query / Сбор всех данных строки для запроса обновления
             row_data = []
-            for col_idx in range(1, self.columnCount()):  # Skip ID column (column 0) / Пропускаем ID (колонка 0)
+            for col_idx in range(
+                1, self.columnCount()
+            ):  # Skip ID column (column 0) / Пропускаем ID (колонка 0)
                 if col_idx == index.column():
-                    row_data.append(new_value)  # Use new value / Используем новое значение
+                    row_data.append(
+                        new_value
+                    )  # Use new value / Используем новое значение
                 else:
                     item = self.item(index.row(), col_idx)
                     row_data.append(item.text() if item else "")
 
             # Execute database update / Выполнение обновления базы данных
             self.condb.connect_to_db()
-            self.condb.execute_query(self.queries['update'], (*row_data, record_id))
+            self.condb.execute_query(self.queries["update"], (*row_data, record_id))
             self.condb.close_connection()
 
             # Update model and emit signal / Обновление модели и испускание сигнала
             result = super().setData(index, value, role)
             if result:
                 self.data_changed.emit()
-                self.lg.debug(f"{self.table_name} Model: updated {column_name} for record {record_id}.")
+                self.lg.debug(
+                    f"{self.table_name} Model: updated {column_name} for record {record_id}."
+                )
 
             return result
 
         except Exception as e:
             self.lg.critical(f"Internal error: {e}.")
             # Show user-friendly error message / Показать удобное для пользователя сообщение об ошибке
-            QMessageBox.warning(None, "Update error", f"Record could not be updated: {str(e)}")
+            QMessageBox.warning(
+                None, "Update error", f"Record could not be updated: {str(e)}"
+            )
             return False
 
     def _validate_data(self, column_name: str, value: str) -> bool:
@@ -311,8 +329,14 @@ class BaseModel(QStandardItemModel):
         try:
             # Проверка на пустоту нового значения колонки, для обязательно заполненных полей
             if not value and column_name in ["f_fio", "f_title"]:
-                self.lg.debug(f"Input FIO or Title in field {column_name}, this is necessary!")
-                QMessageBox.warning(None, "Input necessary fields!!!", f"Field {column_name} necessary to input!!!")
+                self.lg.debug(
+                    f"Input FIO or Title in field {column_name}, this is necessary!"
+                )
+                QMessageBox.warning(
+                    None,
+                    "Input necessary fields!!!",
+                    f"Field {column_name} necessary to input!!!",
+                )
                 return False
 
             self.lg.debug("Validation success.")
